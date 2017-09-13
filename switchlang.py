@@ -11,6 +11,16 @@ class switch:
         self.case('__default__', func)
 
     def case(self, key, func: Callable[[], None]):
+        if isinstance(key, range):
+            for n in range(key.start, key.stop + 1, key.step):
+                self.case(n, func)
+            return
+
+        if isinstance(key, list):
+            for i in key:
+                self.case(i, func)
+            return
+
         if key in self.cases:
             raise ValueError("Duplicate case: {}".format(key))
         if not func:
