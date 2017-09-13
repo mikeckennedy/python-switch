@@ -35,6 +35,7 @@ def process_with_data(*value):
 * Verifies the signatures of the methods
 * Supports default case
 * Checks for duplicate keys / cases
+* Keys can be anything hashable (numbers, strings, objects, etc.)
 * Could be extended for "fall-through" cases (doesn't yet)
 
 
