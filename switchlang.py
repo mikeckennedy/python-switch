@@ -1,5 +1,5 @@
 # Here is a first pass implementation at adding switch
-from typing import Callable
+from typing import Callable, Any
 
 
 class switch:
@@ -7,10 +7,10 @@ class switch:
         self.value = value
         self.cases = {}
 
-    def default(self, func: Callable[[], None]):
+    def default(self, func: Callable[[], Any]):
         self.case('__default__', func)
 
-    def case(self, key, func: Callable[[], None]):
+    def case(self, key, func: Callable[[], Any]):
         if isinstance(key, range):
             for n in range(key.start, key.stop + 1, key.step):
                 self.case(n, func)

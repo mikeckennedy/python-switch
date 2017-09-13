@@ -65,7 +65,7 @@ with switch(value) as s:
 
 **Warning / open for debate**: 
 
-I'm a little unsure what is the right way to handle this
+I'm a little unsure what is the right way to handle this.
 On one hand, reading `case(range(1,5))` seems like it should
 include `1, 2, 3, 4, 5`. But `list(range(1,5))` is `[1,2,3,4]`. 
 So that would be inconsistent.
