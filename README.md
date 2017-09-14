@@ -137,5 +137,5 @@ while True:
     result = switch.get(action, unknown_command)()
 ```
 
-Personally, I much prefer to read and write the on above. That's why I wrote this module.
-It seems to convey the intent of swtich way more than the dict. But either are options.
+Personally, I much prefer to read and write the one above. That's why I wrote this module.
+It seems to convey the intent of switch way more than the dict. But either are options.
