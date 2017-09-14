@@ -1,6 +1,6 @@
 # Here is a first pass implementation at adding switch
 import uuid
-from typing import Callable, Any
+from typing import Callable, Any, List
 
 
 class switch:
@@ -55,6 +55,13 @@ class switch:
     @property
     def result(self):
         if self.__result == switch.__no_result:
-            raise Exception("No result has been computed.")
+            raise Exception("No result has been computed (did you access switch.result inside the with block?)")
 
         return self.__result
+
+
+def closed_range(start: int, stop: int, step=1) -> range:
+    if start >= stop:
+        raise ValueError("Start must be less than stop.")
+
+    return range(start, stop+step, step)
