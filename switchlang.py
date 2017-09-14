@@ -12,7 +12,7 @@ class switch:
 
     def case(self, key, func: Callable[[], Any]):
         if isinstance(key, range):
-            for n in range(key.start, key.stop + 1, key.step):
+            for n in key:
                 self.case(n, func)
             return
 

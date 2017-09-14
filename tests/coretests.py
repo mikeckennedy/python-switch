@@ -88,26 +88,34 @@ class CoreTests(unittest.TestCase):
                 s.case(1, lambda: None)
 
     def test_multiple_values_one_case_range(self):
-        value = 7
-
         executed_case = None
 
         def get_set_case(val):
             nonlocal executed_case
             executed_case = val
 
-        # I'm a little unsure what is the right way to handle this
-        # On one hand, reading case(range(1,5)) seems like it should
-        # include 1, 2, 3, 4, 5.
-        # But list(range(1,5)) is [1,2,3,4]. So that would be inconsistent.
-        # Thoughts?
-        # I'm going with 1,2,3,4,5 for range(1,5) for now.
-        with switch(value) as s:
-            s.case(range(1, 5), lambda: get_set_case("1-to-5"))
+        for value in range(1, 5):
+            with switch(value) as s:
+                s.case(range(1, 6), lambda: get_set_case("1-to-5"))
+                s.case(range(6, 7), lambda: get_set_case("6-to-7"))
+                s.default(lambda: get_set_case('default'))
+
+            self.assertEqual(executed_case, "1-to-5")
+
+        for value in range(6, 7):
+            with switch(value) as s:
+                s.case(range(1, 6), lambda: get_set_case("1-to-5"))
+                s.case(range(6, 7), lambda: get_set_case("6-to-7"))
+                s.default(lambda: get_set_case('default'))
+
+            self.assertEqual(executed_case, "6-to-7")
+
+        with switch(7) as s:
+            s.case(range(1, 6), lambda: get_set_case("1-to-5"))
             s.case(range(6, 7), lambda: get_set_case("6-to-7"))
             s.default(lambda: get_set_case('default'))
 
-        self.assertEqual(executed_case, "6-to-7")
+        self.assertEqual(executed_case, "default")
 
     def test_multiple_values_one_case_list(self):
         value = 6
