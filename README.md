@@ -81,7 +81,7 @@ You write the following code.
 switch = {
     1: method_on_one,
     2: method_on_two,
-    3, method_on_three
+    3: method_three
 }
 
 result = switch.get(value, defult_method_to_run)()
