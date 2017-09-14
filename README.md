@@ -72,4 +72,70 @@ So that would be inconsistent.
 
 Thoughts? I'm going with `1,2,3,4,5` for `range(1,5)` for now. 
 
+## Why not just raw `dict`?
 
+The biggest push back on this idea is that we already have this problem solved.
+You write the following code.
+
+```python
+switch = {
+    1: method_on_one,
+    2: method_on_two,
+    3, method_on_three
+}
+
+result = switch.get(value, defult_method_to_run)()
+```
+
+This works but is very low on the functionality level. We have a better solution here 
+I believe. Let's take this example and see how it looks in python-switch vs raw dicts:
+
+```python
+# with python-switch:
+
+while True:
+    action = get_action(action)
+
+    with switch(action) as s:
+        s.case(['c', 'a'], create_account)
+        s.case('l', log_into_account)
+        s.case('r', register_cage)
+        s.case('u', update_availability)
+        s.case(['v', 'b'], view_bookings)
+        s.case('x', exit_app)
+        s.case('', lambda: None)
+        s.case(range(1,6), lambda: set_level(action))
+        s.default(unknown_command)
+    
+    result = s.result
+```
+
+Now compare that to they espoused *pythonic* way:
+
+```python
+# with raw dicts
+
+while True:
+    action = get_action(action)
+
+    switch = {
+        'c': create_account,
+        'a': create_account,
+        'l': log_into_account,
+        'r': register_cage,
+        'u': update_availability,
+        'v': view_bookings,
+        'b': view_bookings,
+        'x': exit_app,
+        1: lambda: set_level(action),
+        2: lambda: set_level(action),
+        3: lambda: set_level(action),
+        4: lambda: set_level(action),
+        5: lambda: set_level(action),
+        '': lambda: None,
+    }
+    result = switch.get(action, unknown_command)()
+```
+
+Personally, I much prefer to read and write the on above. That's why I wrote this module.
+It seems to convey the intent of swtich way more than the dict. But either are options.
