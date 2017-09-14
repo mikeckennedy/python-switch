@@ -97,7 +97,7 @@ class CoreTests(unittest.TestCase):
         for value in range(1, 5):
             with switch(value) as s:
                 s.case(range(1, 6), lambda: get_set_case("1-to-5"))
-                s.case(range(6, 7), lambda: get_set_case("6-to-7"))
+                s.case(range(6, 7), lambda: get_set_case("6"))
                 s.default(lambda: get_set_case('default'))
 
             self.assertEqual(executed_case, "1-to-5")
@@ -105,14 +105,14 @@ class CoreTests(unittest.TestCase):
         for value in range(6, 7):
             with switch(value) as s:
                 s.case(range(1, 6), lambda: get_set_case("1-to-5"))
-                s.case(range(6, 7), lambda: get_set_case("6-to-7"))
+                s.case(range(6, 7), lambda: get_set_case("6"))
                 s.default(lambda: get_set_case('default'))
 
-            self.assertEqual(executed_case, "6-to-7")
+            self.assertEqual(executed_case, "6")
 
         with switch(7) as s:
             s.case(range(1, 6), lambda: get_set_case("1-to-5"))
-            s.case(range(6, 7), lambda: get_set_case("6-to-7"))
+            s.case(range(6, 7), lambda: get_set_case("6"))
             s.default(lambda: get_set_case('default'))
 
         self.assertEqual(executed_case, "default")
