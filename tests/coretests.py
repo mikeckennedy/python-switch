@@ -132,3 +132,18 @@ class CoreTests(unittest.TestCase):
             s.default(lambda: get_set_case('default'))
 
         self.assertEqual(executed_case, "even")
+
+    def test_return_value_from_case(self):
+        value = 4
+        with switch(value) as s:
+            s.case([1, 3, 5, 7], lambda: value + 1)
+            s.case([0, 2, 4, 6, 8], lambda: value * value)
+            s.default(lambda: 0)
+
+        self.assertEqual(s.result, 16)
+
+    # noinspection PyStatementEffect
+    def test_result_inaccessible_if_hasnt_run(self):
+        with self.assertRaises(Exception):
+            s = switch(7)
+            s.result

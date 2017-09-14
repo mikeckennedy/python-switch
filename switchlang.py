@@ -1,11 +1,15 @@
 # Here is a first pass implementation at adding switch
+import uuid
 from typing import Callable, Any
 
 
 class switch:
+    __no_result = uuid.uuid4()
+
     def __init__(self, value):
         self.value = value
         self.cases = {}
+        self.__result = switch.__no_result
 
     def default(self, func: Callable[[], Any]):
         self.case('__default__', func)
@@ -42,6 +46,15 @@ class switch:
             func = self.cases.get('__default__')
 
         if not func:
-            raise Exception("Value does not match any case and there is no default case: value {}".format(self.value))
+            raise Exception("Value does not match any case and there "
+                            "is no default case: value {}".format(self.value))
 
-        func()
+        # noinspection PyCallingNonCallable
+        self.__result = func()
+
+    @property
+    def result(self):
+        if self.__result == switch.__no_result:
+            raise Exception("No result has been computed.")
+
+        return self.__result
