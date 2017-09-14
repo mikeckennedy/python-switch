@@ -63,14 +63,14 @@ with switch(value) as s:
     s.default(lambda: ...)
 ```
 
-**Closed vs. Open ranges**
+## Closed vs. Open ranges
 
 Looking at the above code it's a bit weird that 6 appears 
 at the end of one case, beginning of the next. But `range()` is
 half open/closed. 
 
 To handle the inclusive case, I've added closed_range(start, stop).
-For example, closed_range(1,5) -> [1,2,3,4,5] 
+For example, `closed_range(1,5)` -> `[1,2,3,4,5]` 
 
 ## Why not just raw `dict`?
 
