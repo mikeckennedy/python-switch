@@ -58,19 +58,19 @@ with switch(value) as s:
 value = 4  # matches first case
 
 with switch(value) as s:
-    s.case(range(1, 5), lambda: ...)
+    s.case(range(1, 6), lambda: ...)
     s.case(range(6, 7), lambda: ...)
     s.default(lambda: ...)
 ```
 
-**Warning / open for debate**: 
+**Closed vs. Open ranges**
 
-I'm a little unsure what is the right way to handle this.
-On one hand, reading `case(range(1,5))` seems like it should
-include `1, 2, 3, 4, 5`. But `list(range(1,5))` is `[1,2,3,4]`. 
-So that would be inconsistent.
+Looking at the above code it's a bit weird that 6 appears 
+at the end of one case, beginning of the next. But `range()` is
+half open/closed. 
 
-Thoughts? I'm going with `1,2,3,4,5` for `range(1,5)` for now. 
+To handle the inclusive case, I've added closed_range(start, stop).
+For example, closed_range(1,5) -> [1,2,3,4,5] 
 
 ## Why not just raw `dict`?
 
