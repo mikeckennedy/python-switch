@@ -59,7 +59,7 @@ value = 4  # matches first case
 
 with switch(value) as s:
     s.case(range(1, 6), lambda: ...)
-    s.case(range(6, 7), lambda: ...)
+    s.case(range(6, 10), lambda: ...)
     s.default(lambda: ...)
 ```
 
@@ -81,7 +81,7 @@ You write the following code.
 switch = {
     1: method_on_one,
     2: method_on_two,
-    3, method_on_three
+    3: method_three
 }
 
 result = switch.get(value, defult_method_to_run)()
