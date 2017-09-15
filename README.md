@@ -10,34 +10,36 @@ way to define execution blocks: the `with` statement.
 
 ```python
 from switchlang import switch
+from typing import Optional
+
+
+def process_a():
+    return "found a"
+
+
+def process_any():
+    return "found default"
+
+
+def process_with_data(*value):
+    return "found with data"
+
 
 num = 7
 val = input("Enter a key. a, b, c or any other: ")
 
 with switch(val) as s:
-    a = s.case('a', process_a)  # -> "a found"
-    b = s.case('b', lambda: process_with_data(val, num, 'other values still'))  # -> None
-    c = s.default(process_any)  # -> None
+    a = s.case('a', process_a)  # -> Optional["found a"]
+    b = s.case('b', lambda: process_with_data(val, num, 'other values still'))  # -> Optional["found with data"]
+    c = s.default(process_any)  # -> Optional["found default"]
 
 with switch(val, fall_through=True) as s:
-    a = s.case('a', process_a)  # -> "a found"
-    b = s.case('b', lambda: process_with_data(val, num, 'other values still'))  # -> "found with data"
-    
-    c = s.case(lambda val: isinstance(val, str), lambda: "matched on predicate")  # -> "matched on predicate"
-    
-    d = s.default(process_any)  # -> None
+    a = s.case('a', process_a)  # -> Optional["found a"]
+    b = s.case('b', lambda: process_with_data(val, num, 'other values still'))  # -> Optional["found with data"]
 
-    
-def process_a():
-    print("Found A!")
-    return "a found"
-    
-def process_any():
-    print("Found Default!")
-    
-def process_with_data(*value):
-    print("Found with data: {}".format(value))
-    return "found with data"
+    c = s.case(lambda val: isinstance(val, str), lambda: "matched on predicate")  # -> "matched on predicate"
+
+    d = s.default(process_any)  # -> "found default"
 ``` 
 
 ## Features
