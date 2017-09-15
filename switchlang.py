@@ -66,11 +66,9 @@ class switch:
         if key == self.value:  # check to see if the key matches self.value
             self.called = True
             return func()
-        elif callable(key):  # the key is a predicate, check to see if it evaluates to True on key(self.value)
-            result = key(self.value)
-            if result:
-                self.called = True
-                return func()
+        elif callable(key) and key(self.value):  # the key is a predicate function
+            self.called = True
+            return func()
 
     def default(self, func: Callable[[], Any]) -> None:
         """
