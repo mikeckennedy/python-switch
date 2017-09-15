@@ -15,18 +15,29 @@ num = 7
 val = input("Enter a key. a, b, c or any other: ")
 
 with switch(val) as s:
-    s.case('a', process_a)
-    s.case('b', lambda: process_with_data(val, num, 'other values still'))
-    s.default(process_any)
+    a = s.case('a', process_a)  # -> "a found"
+    b = s.case('b', lambda: process_with_data(val, num, 'other values still'))  # -> None
+    c = s.default(process_any)  # -> None
+
+with switch(val, fall_through=True) as s:
+    a = s.case('a', process_a)  # -> "a found"
+    b = s.case('b', lambda: process_with_data(val, num, 'other values still'))  # -> "found with data"
+    
+    c = s.case(lambda val: isinstance(val, str), lambda: "matched on predicate")  # -> "matched on predicate"
+    
+    d = s.default(process_any)  # -> None
+
     
 def process_a():
     print("Found A!")
+    return "a found"
     
 def process_any():
     print("Found Default!")
     
 def process_with_data(*value):
     print("Found with data: {}".format(value))
+    return "found with data"
 ``` 
 
 ## Features
@@ -34,10 +45,8 @@ def process_with_data(*value):
 * More explicit than using dictionaries with functions as values.
 * Verifies the signatures of the methods
 * Supports default case
-* Checks for duplicate keys / cases
-* Keys can be anything hashable (numbers, strings, objects, etc.)
 * Could be extended for "fall-through" cases (doesn't yet)
-* Use range and list for multiple cases mapped to a single action
+* Able to dispatch based on predicate functions as well as values
 
 ## Multiple cases, one action
 
@@ -51,26 +60,7 @@ with switch(value) as s:
     s.case([1, 3, 5, 7], lambda: ...)
     s.case([0, 2, 4, 6, 8], lambda: ...)
     s.default(lambda: ...)
-```
-
-```python
-# with ranges:
-value = 4  # matches first case
-
-with switch(value) as s:
-    s.case(range(1, 6), lambda: ...)
-    s.case(range(6, 7), lambda: ...)
-    s.default(lambda: ...)
-```
-
-## Closed vs. Open ranges
-
-Looking at the above code it's a bit weird that 6 appears 
-at the end of one case, beginning of the next. But `range()` is
-half open/closed. 
-
-To handle the inclusive case, I've added closed_range(start, stop).
-For example, `closed_range(1,5)` -> `[1,2,3,4,5]` 
+``` 
 
 ## Why not just raw `dict`?
 
@@ -97,17 +87,24 @@ while True:
     action = get_action(action)
 
     with switch(action) as s:
-        s.case(['c', 'a'], create_account)
-        s.case('l', log_into_account)
-        s.case('r', register_cage)
-        s.case('u', update_availability)
-        s.case(['v', 'b'], view_bookings)
-        s.case('x', exit_app)
-        s.case('', lambda: None)
-        s.case(range(1,6), lambda: set_level(action))
-        s.default(unknown_command)
+        
+        cases = (
+            s.case(['c', 'a'], create_account)
+            s.case('l', log_into_account)
+            s.case('r', register_cage)
+            s.case('u', update_availability)
+            s.case(['v', 'b'], view_bookings)
+            s.case('x', exit_app)
+            s.case('', lambda: None)
+            s.case(range(1,6), lambda: set_level(action))
+            s.default(unknown_command)
+        )
+        
+        if any(cases):
+            result, *_ = (case for case in cases if case)
+        else:
+            result = None
     
-    result = s.result
 ```
 
 Now compare that to they espoused *pythonic* way:
