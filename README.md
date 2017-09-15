@@ -29,13 +29,13 @@ val = 'b'
 
 with switch(val) as s:
     a = s.case('a', process_a)  # -> None
-    b = s.case('b', lambda: process_with_data(val, num, 'other values still'))  # -> "found with data"
+    b = s.case('b', process_with_data)  # -> "found with data"
     c = s.default(process_any)  # -> None
 
 
 with switch(val, fall_through=True) as s:
     a = s.case('a', process_a)  # -> None
-    b = s.case('b', lambda: process_with_data(val, num, 'other values still'))  # -> "found with data"
+    b = s.case('b', process_with_data)  # -> "found with data"
 
     c = s.case(lambda val: isinstance(val, str), lambda: "matched on predicate")  # -> "matched on predicate"
 
