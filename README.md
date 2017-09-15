@@ -59,7 +59,7 @@ value = 4  # matches first case
 
 with switch(value) as s:
     s.case(range(1, 6), lambda: ...)
-    s.case(range(6, 7), lambda: ...)
+    s.case(range(6, 10), lambda: ...)
     s.default(lambda: ...)
 ```
 
