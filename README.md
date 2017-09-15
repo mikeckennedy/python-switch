@@ -47,7 +47,7 @@ with switch(val, fall_through=True) as s:
 * More explicit than using dictionaries with functions as values.
 * Verifies the signatures of the methods
 * Supports default case
-* Could be extended for "fall-through" cases (doesn't yet)
+* Supports optional "fall-through"
 * Able to dispatch based on predicate functions as well as values
 
 ## Multiple cases, one action
@@ -62,7 +62,7 @@ with switch(value) as s:
     s.case([1, 3, 5, 7], lambda: ...)
     s.case([0, 2, 4, 6, 8], lambda: ...)
     s.default(lambda: ...)
-``` 
+
 
 ## Why not just raw `dict`?
 
