@@ -107,7 +107,7 @@ while True:
         s.case(range(1,6), lambda: set_level(action))
         s.default(unknown_command)
     
-    result = s.result
+    print('Result is {}'.format(s.result))
 ```
 
 Now compare that to they espoused *pythonic* way:
@@ -135,6 +135,7 @@ while True:
         '': lambda: None,
     }
     result = switch.get(action, unknown_command)()
+    print('Result is {}'.format(result))
 ```
 
 Personally, I much prefer to read and write the one above. That's why I wrote this module.
@@ -150,7 +151,6 @@ Switch statements are really if / elif / else blocks. So you write the following
 
 while True:
     action = get_action(action)
-    result = None
 
     if action == 'c' or action == 'a':
         result = create_account()
@@ -170,6 +170,8 @@ while True:
         result = set_level(action)
     else:
         unknown_command()
+        
+    print('Result is {}'.format(result))
 ```
 
 I actually believe this is a little better than the 
@@ -177,7 +179,7 @@ I actually believe this is a little better than the
 But there are still things that are harder. 
 
 * How would you deal with fall-through cleanly?
-* Did you notice the bug? We forgot to set result in default case (`else`)?
+* Did you notice the bug? We forgot to set result in default case (`else`) and will result in a runtime error?
 * While it's pretty clear, it's much more verbose and less declarative than the switch version. 
 
 Again, compare the if / elif / else to what you have with switch. This code is identical except 
@@ -198,5 +200,5 @@ while True:
         s.case(range(1,6), lambda: set_level(action))
         s.default(unknown_command)
     
-    result = s.result
+    print('Result is {}'.format(s.result))
 ```
