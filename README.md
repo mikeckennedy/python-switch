@@ -139,3 +139,64 @@ while True:
 
 Personally, I much prefer to read and write the one above. That's why I wrote this module.
 It seems to convey the intent of switch way more than the dict. But either are options.
+
+## Why not just `if / elif / else`?
+
+The another push back on this idea is that we already have this problem solved.
+Switch statements are really if / elif / else blocks. So you write the following code.
+
+```python
+# with if / elif / else
+
+while True:
+    action = get_action(action)
+    result = None
+
+    if action == 'c' or action == 'a':
+        result = create_account()
+    elif action == 'l':
+        result = log_into_account()
+    elif action == 'r':
+        result = register_cage()
+    elif action == 'u':
+        result = update_availability()
+    elif action == 'v':
+        result = view_bookings()
+    elif action == 'b':
+        result = view_bookings()
+    elif action == 'x':
+        result = exit_app()
+    elif action in {1, 2, 3, 4, 5}:
+        result = set_level(action)
+    else:
+        unknown_command()
+```
+
+I actually believe this is a little better than the 
+[raw dict option](https://github.com/mikeckennedy/python-switch#why-not-just-raw-dict).
+But there are still things that are harder. 
+
+* How would you deal with fall-through cleanly?
+* Did you notice the bug? We forgot to set result in default case (`else`)?
+* While it's pretty clear, it's much more verbose and less declarative than the switch version. 
+
+Again, compare the if / elif / else to what you have with switch. This code is identical except 
+doesn't have the default case bug.
+
+```python
+while True:
+    action = get_action(action)
+
+    with switch(action) as s:
+        s.case(['c', 'a'], create_account)
+        s.case('l', log_into_account)
+        s.case('r', register_cage)
+        s.case('u', update_availability)
+        s.case(['v', 'b'], view_bookings)
+        s.case('x', exit_app)
+        s.case('', lambda: None)
+        s.case(range(1,6), lambda: set_level(action))
+        s.default(unknown_command)
+    
+    result = s.result
+```
