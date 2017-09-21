@@ -158,11 +158,9 @@ while True:
         result = log_into_account()
     elif action == 'r':
         result = register_cage()
-    elif action == 'u':
+    elif action == 'a':
         result = update_availability()
-    elif action == 'v':
-        result = view_bookings()
-    elif action == 'b':
+    elif action == 'v' or action == 'b':
         result = view_bookings()
     elif action == 'x':
         result = exit_app()
@@ -179,7 +177,9 @@ I actually believe this is a little better than the
 But there are still things that are harder. 
 
 * How would you deal with fall-through cleanly?
-* Did you notice the bug? We forgot to set result in default case (`else`) and will result in a runtime error?
+* Did you notice the bug? We forgot to set result in default case (`else`) and will result in a runtime error (but only if that case hits).
+* There is another bug. Update `update_availability` will never run because it's command (`a`) is bound to two cases. 
+This is guarded against in switch and you would receive a duplicate case error the first time it runs at all.
 * While it's pretty clear, it's much more verbose and less declarative than the switch version. 
 
 Again, compare the if / elif / else to what you have with switch. This code is identical except 
