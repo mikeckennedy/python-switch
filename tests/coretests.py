@@ -129,3 +129,42 @@ class CoreTests(unittest.TestCase):
             s.default(lambda: 'default')
 
         self.assertEqual(s.result, "6")
+
+    def test_fallthrough_simple(self):
+        visited = []
+        value = 2
+        with switch(value) as s:
+            s.case(1, lambda: visited.append(1) or 1)
+            s.case(2, lambda: visited.append(2) or 2, fallthrough=True)
+            s.default(lambda: visited.append('default') or 'default')
+
+        self.assertEqual(s.result, "default")
+        self.assertEqual(visited, [2, 'default'])
+
+    def test_fallthrough_list(self):
+        visited = []
+        value = 5
+        with switch(value) as s:
+            s.case([1, 2, 3], lambda: visited.append(1) or 1)
+            s.case([4, 5, 6], lambda: visited.append(4) or 4, fallthrough=True)
+            s.case([7, 8, 9], lambda: visited.append(7) or 7, fallthrough=True)
+            s.default(lambda: visited.append('default') or 'default')
+
+        self.assertEqual(s.result, "default")
+        self.assertEqual(visited, [4, 7, 'default'])
+
+    def test_fallthrough_some_list(self):
+        visited = []
+        value = 5
+        with switch(value) as s:
+            s.case([1, 2, 3], lambda: visited.append(1) or 1)
+            s.case([4, 5, 6], lambda: visited.append(4) or 4, fallthrough=True)
+            s.case([7, 8, 9], lambda: visited.append(7) or 7)
+            s.default(lambda: visited.append('default') or 'default')
+
+        self.assertEqual(s.result, 7)
+        self.assertEqual(visited, [4, 7])
+
+
+if __name__ == '__main__':
+    unittest.main()
