@@ -1,9 +1,13 @@
-# Here is a first pass implementation at adding switch
 import uuid
 from typing import Callable, Any
 
 
 class switch:
+    """
+        python-switch is a module-level implementation of the switch statement for Python.
+        See https://github.com/mikeckennedy/python-switch for full details.
+        Copyright Michael Kennedy (https://twitter.com/mkennedy)
+    """
     __no_result = uuid.uuid4()
     __default = uuid.uuid4()
 
@@ -16,9 +20,33 @@ class switch:
         self._func_stack = []
 
     def default(self, func: Callable[[], Any]):
+        """
+            Use as option final statement in switch block.
+
+            with switch(val) as s:
+               s.case(...)
+               s.case(...)
+               s.default(function)
+
+        :param func: Any callable taking no parameters to be executed if this (default) case matches.
+        :return: None
+        """
         self.case(switch.__default, func)
 
     def case(self, key, func: Callable[[], Any], fallthrough=False):
+        """
+            Specify a case for the switch block:
+
+            with switch(val) as s:
+               s.case('a', function)
+               s.case('b', function, fallthrough=True)
+               s.default(function)
+
+        :param key: Key for the case test (if this is a list or range, the items will each be added as a case)
+        :param func: Any callable taking no parameters to be executed if this case matches.
+        :param fallthrough: Optionally fall through to the subsequent case (defaults to False)
+        :return:
+        """
         if fallthrough is not None:
             if self._falling_through:
                 self._func_stack.append(func)
@@ -77,4 +105,4 @@ def closed_range(start: int, stop: int, step=1) -> range:
     if start >= stop:
         raise ValueError("Start must be less than stop.")
 
-    return range(start, stop+step, step)
+    return range(start, stop + step, step)

@@ -165,6 +165,62 @@ class CoreTests(unittest.TestCase):
         self.assertEqual(s.result, 7)
         self.assertEqual(visited, [4, 7])
 
+    def test_fallthrough_then_stop(self):
+        visited = []
+        value = 2
+        with switch(value) as s:
+            s.case(1, lambda: visited.append(1) or 1)
+            s.case(2, lambda: visited.append(2) or 2, fallthrough=True)
+            s.case(3, lambda: visited.append(3) or 3, fallthrough=True)
+            s.case(4, lambda: visited.append(4) or 4)
+            s.case(5, lambda: visited.append(5) or 5)
+            s.default(lambda: visited.append('default') or 'default')
+
+        self.assertEqual(s.result, 4)
+        self.assertEqual(visited, [2, 3, 4])
+
+    def test_fallthrough_middle_then_stop(self):
+        visited = []
+        value = 3
+        with switch(value) as s:
+            s.case(1, lambda: visited.append(1) or 1)
+            s.case(2, lambda: visited.append(2) or 2, fallthrough=True)
+            s.case(3, lambda: visited.append(3) or 3, fallthrough=True)
+            s.case(4, lambda: visited.append(4) or 4)
+            s.case(5, lambda: visited.append(5) or 5)
+            s.default(lambda: visited.append('default') or 'default')
+
+        self.assertEqual(s.result, 4)
+        self.assertEqual(visited, [3, 4])
+
+    def test_fallthrough_available_but_not_hit(self):
+        visited = []
+        value = 5
+        with switch(value) as s:
+            s.case(1, lambda: visited.append(1) or 1)
+            s.case(2, lambda: visited.append(2) or 2, fallthrough=True)
+            s.case(3, lambda: visited.append(3) or 3, fallthrough=True)
+            s.case(4, lambda: visited.append(4) or 4)
+            s.case(5, lambda: visited.append(5) or 5)
+            s.default(lambda: visited.append('default') or 'default')
+
+        self.assertEqual(s.result, 5)
+        self.assertEqual(visited, [5])
+
+    def test_fallthrough__no_match_but_not_hit(self):
+        visited = []
+        value = 'gone'
+        with switch(value) as s:
+            s.case(1, lambda: visited.append(1) or 1)
+            s.case(2, lambda: visited.append(2) or 2, fallthrough=True)
+            s.case(3, lambda: visited.append(3) or 3, fallthrough=True)
+            s.case(4, lambda: visited.append(4) or 4)
+            s.case(5, lambda: visited.append(5) or 5)
+            s.default(lambda: visited.append('default') or 'default')
+
+        self.assertEqual(s.result, 'default')
+        self.assertEqual(visited, ['default'])
+
 
 if __name__ == '__main__':
     unittest.main()
