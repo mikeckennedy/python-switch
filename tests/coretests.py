@@ -221,6 +221,12 @@ class CoreTests(unittest.TestCase):
         self.assertEqual(s.result, 'default')
         self.assertEqual(visited, ['default'])
 
+    def test_empty_collection_clause_is_error(self):
+        with self.assertRaises(ValueError):
+            with switch('val') as s:
+                s.case([], lambda: None)
+                s.default(lambda: 'default')
+
 
 if __name__ == '__main__':
     unittest.main()

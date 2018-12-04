@@ -53,13 +53,20 @@ class switch:
                 if not fallthrough:
                     self._falling_through = False
 
-        if isinstance(key, list) or isinstance(key, range):
+        if isinstance(key, range):
+            key = list(key)
+
+        if isinstance(key, list):
+            if not key:
+                raise ValueError("You cannot pass an empty collection as the case. It will never match.")
+
             found = False
             for i in key:
                 if self.case(i, func, fallthrough=None):
                     found = True
                     if fallthrough is not None:
                         self._falling_through = fallthrough
+
             return found
 
         if key in self.cases:
