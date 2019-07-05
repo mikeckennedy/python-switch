@@ -110,7 +110,7 @@ while True:
     print('Result is {}'.format(s.result))
 ```
 
-Now compare that to they espoused *pythonic* way:
+Now compare that to the espoused *pythonic* way:
 
 ```python
 # with raw dicts
