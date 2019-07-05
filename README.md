@@ -12,7 +12,7 @@ way to define execution blocks: the `with` statement.
 from switchlang import switch
 
 num = 7
-val = input("Enter a key. a, b, c or any other: ")
+val = input("Enter a character, a, b, c or any other: ")
 
 with switch(val) as s:
     s.case('a', process_a)
