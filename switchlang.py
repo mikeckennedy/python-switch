@@ -70,7 +70,7 @@ class switch:
             return found
 
         if key in self.cases:
-            raise ValueError("Duplicate case: {}".format(key))
+            raise ValueError(f"Duplicate case: {key}")
         if not func:
             raise ValueError("Action for case cannot be None.")
         if not callable(func):
