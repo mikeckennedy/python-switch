@@ -84,7 +84,7 @@ switch = {
     3: method_three
 }
 
-result = switch.get(value, defult_method_to_run)()
+result = switch.get(value, default_method_to_run)()
 ```
 
 This works but is very low on the functionality level. We have a better solution here 
