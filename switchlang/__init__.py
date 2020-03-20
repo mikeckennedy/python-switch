@@ -1,5 +1,9 @@
 """
 switchlang - Adds switch blocks to Python
+
+See https://github.com/mikeckennedy/python-switch for full details.
+Copyright Michael Kennedy (https://twitter.com/mkennedy)
+License: MIT
 """
 
 __version__ = '0.1.1'
