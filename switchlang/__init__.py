@@ -6,7 +6,7 @@ Copyright Michael Kennedy (https://twitter.com/mkennedy)
 License: MIT
 """
 
-__version__ = '0.1.1'
+__version__ = '0.1.0'
 __author__ = 'Michael Kennedy <michael@talkpython.fm>'
 __all__ = ['switch', 'closed_range']
 
