@@ -1,6 +1,10 @@
-# python-switch
+# switchlang
+[![](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/) 
+[![](https://img.shields.io/pypi/l/markdown-subtemplate.svg)](https://github.com/mikeckennedy/python-switch/blob/master/LICENSE)
+[![](https://img.shields.io/pypi/dm/python-switch.svg)](https://test.pypi.org/project/switchlang/)
 
-Adds switch blocks to Python.
+
+Adds switch blocks to the Python language.
 
 This module adds explicit switch functionality to Python 
 without changing the language. It builds upon a standard
@@ -28,6 +32,14 @@ def process_any():
 def process_with_data(*value):
     print("Found with data: {}".format(value))
 ``` 
+
+## Installation
+
+Simply install via pip:
+
+```bash
+pip install switchlang
+```
 
 ## Features
 
