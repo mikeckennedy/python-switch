@@ -22,12 +22,14 @@ class switch:
 
     def default(self, func: Callable[[], Any]):
         """
-            Use as option final statement in switch block.
+        Use as option final statement in switch block.
 
+        ```
             with switch(val) as s:
                s.case(...)
                s.case(...)
                s.default(function)
+        ```
 
         :param func: Any callable taking no parameters to be executed if this (default) case matches.
         :return: None
@@ -36,12 +38,14 @@ class switch:
 
     def case(self, key, func: Callable[[], Any], fallthrough: Optional[bool] = False):
         """
-            Specify a case for the switch block:
+        Specify a case for the switch block:
 
+        ```
             with switch(val) as s:
                s.case('a', function)
                s.case('b', function, fallthrough=True)
                s.default(function)
+        ```
 
         :param key: Key for the case test (if this is a list or range, the items will each be added as a case)
         :param func: Any callable taking no parameters to be executed if this case matches.
@@ -102,6 +106,20 @@ class switch:
 
     @property
     def result(self):
+        """
+        The value captured from the method called for a given case.
+
+        ```
+            value = 4
+            with switch(value) as s:
+                s.case(closed_range(1, 5), lambda: "1-to-5")
+                # ...
+
+            res = s.result  # res == '1-to-5'
+        ```
+
+        :return: The value captured from the method called for a given case.
+        """
         if self.__result == switch.__no_result:
             raise Exception("No result has been computed (did you access "
                             "switch.result inside the with block?)")
@@ -110,6 +128,22 @@ class switch:
 
 
 def closed_range(start: int, stop: int, step=1) -> range:
+    """
+    Creates a closed range that allows you to specify a case
+    from [start, stop] inclusively.
+
+    ```
+        with switch(value) as s:
+            s.case(closed_range(1, 5), lambda: "1-to-5")
+            s.case(closed_range(6, 7), lambda: "6")
+            s.default(lambda: 'default')
+    ```
+
+    :param start: The inclusive lower bound of the range [start, stop].
+    :param stop: The inclusive upper bound of the range [start, stop].
+    :param step: The step size between elements (defaults to 1).
+    :return: A range() generator that has a closed upper bound.
+    """
     if start >= stop:
         raise ValueError("Start must be less than stop.")
 
