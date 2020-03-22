@@ -1,7 +1,7 @@
 # switchlang
 [![](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/) 
 [![](https://img.shields.io/pypi/l/markdown-subtemplate.svg)](https://github.com/mikeckennedy/python-switch/blob/master/LICENSE)
-[![](https://img.shields.io/pypi/dm/python-switch.svg)](https://test.pypi.org/project/switchlang/)
+[![](https://img.shields.io/pypi/dm/switchlang.svg)](https://test.pypi.org/project/switchlang/)
 
 
 Adds switch blocks to the Python language.
