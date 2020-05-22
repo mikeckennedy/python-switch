@@ -15,13 +15,14 @@ way to define execution blocks: the `with` statement.
 ```python
 from switchlang import switch
 
-num = 7
-val = input("Enter a character, a, b, c or any other: ")
+def main():
+    num = 7
+    val = input("Enter a character, a, b, c or any other: ")
 
-with switch(val) as s:
-    s.case('a', process_a)
-    s.case('b', lambda: process_with_data(val, num, 'other values still'))
-    s.default(process_any)
+    with switch(val) as s:
+        s.case('a', process_a)
+        s.case('b', lambda: process_with_data(val, num, 'other values still'))
+        s.default(process_any)
     
 def process_a():
     print("Found A!")
@@ -31,6 +32,8 @@ def process_any():
     
 def process_with_data(*value):
     print("Found with data: {}".format(value))
+
+main()
 ``` 
 
 ## Installation
