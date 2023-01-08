@@ -1,14 +1,16 @@
 # switchlang
-[![](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/) 
+
+[![](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/)
 [![](https://img.shields.io/pypi/l/markdown-subtemplate.svg)](https://github.com/mikeckennedy/python-switch/blob/master/LICENSE)
 [![](https://img.shields.io/pypi/dm/switchlang.svg)](https://pypi.org/project/switchlang/)
 
-
 Adds switch blocks to the Python language.
 
-This module adds explicit switch functionality to Python 
+This module adds explicit switch functionality to Python
 without changing the language. It builds upon a standard
-way to define execution blocks: the `with` statement.
+way to define execution b
+
+ocks: the `with` statement.
 
 ## Example
 
@@ -16,6 +18,15 @@ way to define execution blocks: the `with` statement.
 from switchlang import switch
 
 def main():
+    def process_a():
+        print("Found A!")
+    
+    def process_any():
+        print("Found Default!")
+    
+    def process_with_data(*value):
+        print("Found with data: {}".format(value))
+    
     num = 7
     val = input("Enter a character, a, b, c or any other: ")
 
@@ -23,18 +34,9 @@ def main():
         s.case('a', process_a)
         s.case('b', lambda: process_with_data(val, num, 'other values still'))
         s.default(process_any)
-    
-def process_a():
-    print("Found A!")
-    
-def process_any():
-    print("Found Default!")
-    
-def process_with_data(*value):
-    print("Found with data: {}".format(value))
 
 main()
-``` 
+```
 
 ## Installation
 
@@ -80,12 +82,12 @@ with switch(value) as s:
 
 ## Closed vs. Open ranges
 
-Looking at the above code it's a bit weird that 6 appears 
+Looking at the above code it's a bit weird that 6 appears
 at the end of one case, beginning of the next. But `range()` is
-half open/closed. 
+half open/closed.
 
 To handle the inclusive case, I've added `closed_range(start, stop)`.
-For example, `closed_range(1,5)` -> `[1,2,3,4,5]` 
+For example, `closed_range(1,5)` -> `[1,2,3,4,5]`
 
 ## Why not just raw `dict`?
 
@@ -102,7 +104,7 @@ switch = {
 result = switch.get(value, default_method_to_run)()
 ```
 
-This works but is very low on the functionality level. We have a better solution here 
+This works but is very low on the functionality level. We have a better solution here
 I believe. Let's take this example and see how it looks in python-switch vs raw dicts:
 
 ```python
@@ -121,7 +123,7 @@ while True:
         s.case('', lambda: None)
         s.case(range(1,6), lambda: set_level(action))
         s.default(unknown_command)
-    
+  
     print('Result is {}'.format(s.result))
 ```
 
@@ -183,21 +185,21 @@ while True:
         result = set_level(action)
     else:
         unknown_command()
-        
+      
     print('Result is {}'.format(result))
 ```
 
-I actually believe this is a little better than the 
+I actually believe this is a little better than the
 [raw dict option](https://github.com/mikeckennedy/python-switch#why-not-just-raw-dict).
-But there are still things that are harder. 
+But there are still things that are harder.
 
 * How would you deal with fall-through cleanly?
 * Did you notice the bug? We forgot to set result in default case (`else`) and will result in a runtime error (but only if that case hits).
-* There is another bug. Update `update_availability` will never run because it's command (`a`) is bound to two cases. 
-This is guarded against in switch and you would receive a duplicate case error the first time it runs at all.
-* While it's pretty clear, it's much more verbose and less declarative than the switch version. 
+* There is another bug. Update `update_availability` will never run because it's command (`a`) is bound to two cases.
+  This is guarded against in switch and you would receive a duplicate case error the first time it runs at all.
+* While it's pretty clear, it's much more verbose and less declarative than the switch version.
 
-Again, compare the if / elif / else to what you have with switch. This code is identical except 
+Again, compare the if / elif / else to what you have with switch. This code is identical except
 doesn't have the default case bug.
 
 ```python
@@ -214,6 +216,6 @@ while True:
         s.case('', lambda: None)
         s.case(range(1,6), lambda: set_level(action))
         s.default(unknown_command)
-    
+  
     print('Result is {}'.format(s.result))
 ```
