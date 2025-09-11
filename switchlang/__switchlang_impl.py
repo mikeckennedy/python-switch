@@ -1,26 +1,27 @@
+import typing
 import uuid
-from typing import Callable, Any, Optional
 
 
 class switch:
     """
-        switch is a module-level implementation of the switch statement for Python.
-        See https://github.com/mikeckennedy/python-switch for full details.
-        Copyright Michael Kennedy (https://twitter.com/mkennedy)
-        License: MIT
+    switch is a module-level implementation of the switch statement for Python.
+    See https://github.com/mikeckennedy/python-switch for full details.
+    Copyright Michael Kennedy (https://mkennedy.codes)
+    License: MIT
     """
-    __no_result = uuid.uuid4()
-    __default = uuid.uuid4()
 
-    def __init__(self, value):
+    __no_result: typing.Any = uuid.uuid4()
+    __default: typing.Any = uuid.uuid4()
+
+    def __init__(self, value: typing.Any):
         self.value = value
-        self.cases = set()
+        self.cases: typing.Set[typing.Any] = set()
         self._found = False
         self.__result = switch.__no_result
         self._falling_through = False
-        self._func_stack = []
+        self._func_stack: typing.List[typing.Callable[[], typing.Any]] = []
 
-    def default(self, func: Callable[[], Any]):
+    def default(self, func: typing.Callable[[], typing.Any]):
         """
         Use as option final statement in switch block.
 
@@ -36,7 +37,12 @@ class switch:
         """
         self.case(switch.__default, func)
 
-    def case(self, key, func: Callable[[], Any], fallthrough: Optional[bool] = False):
+    def case(
+        self,
+        key: typing.Any,
+        func: typing.Callable[[], typing.Any],
+        fallthrough: typing.Optional[bool] = False,
+    ):
         """
         Specify a case for the switch block:
 
@@ -63,7 +69,9 @@ class switch:
 
         if isinstance(key, list):
             if not key:
-                raise ValueError("You cannot pass an empty collection as the case. It will never match.")
+                raise ValueError(
+                    "You cannot pass an empty collection as the case. It will never match."
+                )
 
             found = False
             for i in key:
@@ -97,8 +105,10 @@ class switch:
             raise exc_val
 
         if not self._func_stack:
-            raise Exception("Value does not match any case and there "
-                            "is no default case: value {}".format(self.value))
+            raise Exception(
+                "Value does not match any case and there "
+                "is no default case: value {}".format(self.value)
+            )
 
         for func in self._func_stack:
             # noinspection PyCallingNonCallable
@@ -121,8 +131,10 @@ class switch:
         :return: The value captured from the method called for a given case.
         """
         if self.__result == switch.__no_result:
-            raise Exception("No result has been computed (did you access "
-                            "switch.result inside the with block?)")
+            raise Exception(
+                "No result has been computed (did you access "
+                "switch.result inside the with block?)"
+            )
 
         return self.__result
 
