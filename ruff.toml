@@ -3,7 +3,7 @@ line-length = 120
 format.quote-style = "single"
 
 # Enable Pyflakes `E` and `F` codes by default.
-lint.select = ["E", "F"]
+lint.select = ["E", "F", "I"]
 lint.ignore = []
 
 # Exclude a variety of commonly ignored directories.
