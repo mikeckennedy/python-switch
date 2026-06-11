@@ -165,7 +165,9 @@ class switch:
         :return: The value returned by the matched case's function (the last one executed when falling through).
         :raises Exception: If accessed before the switch block has exited and computed a result.
         """
-        if self.__result == switch.__no_result:
+        # Identity, not equality: a result with a permissive __eq__ (e.g. a numpy
+        # array) must not be mistaken for the no-result sentinel.
+        if self.__result is switch.__no_result:
             raise Exception('No result has been computed (did you access switch.result inside the with block?)')
 
         return self.__result
@@ -176,7 +178,10 @@ def closed_range(start: int, stop: int, step: int = 1) -> range:
     Create a closed range for a case: both `start` and `stop` are included.
 
     With the default step of 1, `closed_range(1, 5)` covers 1, 2, 3, 4, 5 —
-    unlike `range(1, 5)`, the upper bound is part of the range.
+    unlike `range(1, 5)`, the upper bound is part of the range. With a larger
+    step the range never goes past `stop`: `closed_range(1, 6, 2)` covers
+    1, 3, 5, and `stop` itself is included when the step lands on it exactly,
+    as in `closed_range(1, 7, 2)` -> 1, 3, 5, 7.
 
     ```
         with switch(value) as s:
@@ -187,11 +192,13 @@ def closed_range(start: int, stop: int, step: int = 1) -> range:
 
     :param start: The inclusive lower bound of the range.
     :param stop: The inclusive upper bound of the range.
-    :param step: The step size between elements (defaults to 1).
+    :param step: The step size between elements; must be 1 or greater (defaults to 1).
     :return: A range object with a closed (inclusive) upper bound.
-    :raises ValueError: If start is not less than stop.
+    :raises ValueError: If start is not less than stop, or step is less than 1.
     """
     if start >= stop:
         raise ValueError('Start must be less than stop.')
+    if step < 1:
+        raise ValueError('Step must be 1 or greater.')
 
-    return range(start, stop + step, step)
+    return range(start, stop + 1, step)

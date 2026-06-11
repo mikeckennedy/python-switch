@@ -105,6 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script async="" src="https://uma.mkennedy.codes/script.js" data-website-id="fc9b6770-3b44-4073-944e-4a4f0e79f66a"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script>document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:(document.querySelector('meta[name="quarto:offset"]')||{content:''}).content+'termshow.css'}));</script>
 <script src="../theme-init.js"></script>
@@ -281,7 +282,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L174-L197" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L176-L204" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">closed_range</span>(
@@ -291,7 +292,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 )</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>With the default step of 1, <code>closed_range(1, 5)</code> covers 1, 2, 3, 4, 5 — unlike <code>range(1, 5)</code>, the upper bound is part of the range.</p>
+<p>With the default step of 1, <code>closed_range(1, 5)</code> covers 1, 2, 3, 4, 5 — unlike <code>range(1, 5)</code>, the upper bound is part of the range. With a larger step the range never goes past <code>stop</code>: <code>closed_range(1, 6, 2)</code> covers 1, 3, 5, and <code>stop</code> itself is included when the step lands on it exactly, as in <code>closed_range(1, 7, 2)</code> -&gt; 1, 3, 5, 7.</p>
 <pre><code>    with switch(value) as s:
         s.case(closed_range(1, 5), lambda: "1-to-5")
         s.case(closed_range(6, 7), lambda: "6-or-7")
@@ -311,7 +312,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </dd>
 <dt><code><span class="doc-parameter-name">step</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="dv">1</span></span></code></dt>
 <dd>
-The step size between elements (defaults to 1).
+The step size between elements; must be 1 or greater (defaults to 1).
 </dd>
 </dl>
 </div>
@@ -333,7 +334,7 @@ A range object with a closed (inclusive) upper bound.
 <dl>
 <dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
 <dd>
-If start is not less than stop.
+If start is not less than stop, or step is less than 1.
 </dd>
 </dl>
 </div>

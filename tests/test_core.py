@@ -108,6 +108,22 @@ class CoreTests(unittest.TestCase):
             s = switch(7)
             s.result
 
+    def test_result_holding_always_equal_object(self):
+        # a result that compares equal to everything (numpy arrays are the
+        # real-world case) must not be mistaken for the no-result sentinel
+        class AlwaysEqual:
+            def __eq__(self, other):
+                return True
+
+            def __hash__(self):
+                return 0
+
+        obj = AlwaysEqual()
+        with switch('x') as s:
+            s.case('x', lambda: obj)
+
+        self.assertIs(s.result, obj)
+
     def test_closed_range(self):
         for value in [1, 2, 3, 4, 5]:
             with switch(value) as s:
@@ -130,6 +146,28 @@ class CoreTests(unittest.TestCase):
             s.default(lambda: 'default')
 
         self.assertEqual(s.result, '6')
+
+    def test_closed_range_with_step(self):
+        self.assertEqual(list(closed_range(1, 5)), [1, 2, 3, 4, 5])
+        # the range must never overshoot stop (it used to, by step - 1)
+        self.assertEqual(list(closed_range(1, 6, 2)), [1, 3, 5])
+        self.assertEqual(list(closed_range(1, 10, 4)), [1, 5, 9])
+        # stop is included when the step lands on it exactly
+        self.assertEqual(list(closed_range(1, 7, 2)), [1, 3, 5, 7])
+
+        # 7 lies outside [1, 6], so it must hit the default case
+        with switch(7) as s:
+            s.case(closed_range(1, 6, 2), lambda: '1-to-6 odds')
+            s.default(lambda: 'default')
+
+        self.assertEqual(s.result, 'default')
+
+    def test_closed_range_invalid_step(self):
+        with self.assertRaises(ValueError):
+            closed_range(1, 10, 0)
+
+        with self.assertRaises(ValueError):
+            closed_range(1, 10, -2)
 
     def test_fallthrough_simple(self):
         visited = []

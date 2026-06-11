@@ -105,3 +105,4 @@ great-docs/
 .ruff_cache/
 .pytest_cache/
 docs/build-timings.json
+uv.lock

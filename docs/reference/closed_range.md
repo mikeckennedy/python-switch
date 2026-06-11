@@ -15,7 +15,7 @@ closed_range(
 ```
 
 
-With the default step of 1, `closed_range(1, 5)` covers 1, 2, 3, 4, 5 -- unlike `range(1, 5)`, the upper bound is part of the range.
+With the default step of 1, `closed_range(1, 5)` covers 1, 2, 3, 4, 5 -- unlike `range(1, 5)`, the upper bound is part of the range. With a larger step the range never goes past `stop`: `closed_range(1, 6, 2)` covers 1, 3, 5, and `stop` itself is included when the step lands on it exactly, as in `closed_range(1, 7, 2)` -\> 1, 3, 5, 7.
 
         with switch(value) as s:
             s.case(closed_range(1, 5), lambda: "1-to-5")
@@ -33,7 +33,7 @@ The inclusive lower bound of the range.
 The inclusive upper bound of the range.
 
 `step: int = ``1`  
-The step size between elements (defaults to 1).
+The step size between elements; must be 1 or greater (defaults to 1).
 
 
 ## Returns
@@ -47,4 +47,4 @@ A range object with a closed (inclusive) upper bound.
 
 
 `ValueError`  
-If start is not less than stop.
+If start is not less than stop, or step is less than 1.
