@@ -1,6 +1,6 @@
 # switchlang
-[![](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/) 
-[![](https://img.shields.io/pypi/l/markdown-subtemplate.svg)](https://github.com/mikeckennedy/python-switch/blob/master/LICENSE)
+[![](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/) 
+[![](https://img.shields.io/pypi/l/switchlang.svg)](https://github.com/mikeckennedy/python-switch/blob/master/LICENSE)
 [![](https://img.shields.io/pypi/dm/switchlang.svg)](https://pypi.org/project/switchlang/)
 
 
@@ -51,7 +51,7 @@ pip install switchlang
 * Supports default case
 * Checks for duplicate keys / cases
 * Keys can be anything hashable (numbers, strings, objects, etc.)
-* Could be extended for "fall-through" cases (doesn't yet)
+* Supports "fall-through" cases (opt-in with `fallthrough=True`)
 * Use range and list for multiple cases mapped to a single action
 
 ## Multiple cases, one action
@@ -158,7 +158,7 @@ It seems to convey the intent of switch way more than the dict. But either are o
 
 ## Why not just `if / elif / else`?
 
-The another push back on this idea is that we already have this problem solved.
+Another push back on this idea is that we already have this problem solved.
 Switch statements are really if / elif / else blocks. So you write the following code.
 
 ```python
@@ -193,7 +193,7 @@ But there are still things that are harder.
 
 * How would you deal with fall-through cleanly?
 * Did you notice the bug? We forgot to set result in default case (`else`) and will result in a runtime error (but only if that case hits).
-* There is another bug. Update `update_availability` will never run because it's command (`a`) is bound to two cases. 
+* There is another bug. `update_availability` will never run because its command (`a`) is bound to two cases. 
 This is guarded against in switch and you would receive a duplicate case error the first time it runs at all.
 * While it's pretty clear, it's much more verbose and less declarative than the switch version. 
 

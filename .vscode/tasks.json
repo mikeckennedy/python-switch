@@ -1,0 +1,16 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Docs",
+            "type": "shell",
+            "command": "${workspaceFolder}/venv/bin/python",
+            "args": ["${workspaceFolder}/scripts/build_docs.py"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

@@ -6,9 +6,14 @@ Copyright Michael Kennedy (https://twitter.com/mkennedy)
 License: MIT
 """
 
-__version__ = '0.1.1'
+from importlib.metadata import PackageNotFoundError, version
+
+try:
+    __version__ = version('switchlang')
+except PackageNotFoundError:  # pragma: no cover
+    __version__ = '0.0.0'
 __author__ = 'Michael Kennedy <michael@talkpython.fm>'
 __all__ = ['switch', 'closed_range']
 
-from .__switchlang_impl import switch
-from .__switchlang_impl import closed_range
+from .__switchlang_impl import switch # noqa
+from .__switchlang_impl import closed_range # noqa

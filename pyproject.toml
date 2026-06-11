@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "switchlang"
+version = "0.1.2"
+description = "Adds switch blocks to the Python language."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Michael Kennedy", email = "michael@talkpython.fm" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/mikeckennedy/python-switch"
+Documentation = "https://mkennedy.codes/docs/python-switch"
+Repository = "https://github.com/mikeckennedy/python-switch"
+Issues = "https://github.com/mikeckennedy/python-switch/issues"
+PyPI = "https://pypi.org/project/switchlang/"
+Funding = "https://github.com/sponsors/mikeckennedy"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "great-docs; python_version >= '3.11'",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["switchlang"]

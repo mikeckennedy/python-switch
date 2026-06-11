@@ -1,0 +1,11 @@
+{
+  "skills": [
+    {
+      "name": "switchlang",
+      "description": "Adds switch blocks to the Python language. Use when writing Python code that uses the switchlang package.",
+      "files": [
+        "SKILL.md"
+      ]
+    }
+  ]
+}

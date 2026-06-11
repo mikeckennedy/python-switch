@@ -1,0 +1,67 @@
+# Great Docs Configuration
+# See https://posit-dev.github.io/great-docs/user-guide/configuration.html
+#
+# Built site is mirrored into the committed repo-root docs/ folder by
+# scripts/build_docs.py and served by nginx at /docs/python-switch.
+
+display_name: switchlang
+
+# Docstring format used in switchlang (":param x:" / ":return:" style).
+# Pinned rather than relying on auto-detect.
+parser: sphinx
+
+# Runtime introspection — requires switchlang to be importable in this venv
+# (it is installed editable via the [dev] extra).
+dynamic: true
+
+# Subpath hosting: drives Quarto's base path so CSS/JS/nav resolve.
+# Keep the trailing slash.
+site_url: "https://mkennedy.codes/docs/python-switch/"
+
+# GOTCHA: sitemap/robots/canonical/og:url use a SEPARATE base URL that
+# Great Docs auto-detects from the GitHub repo (-> mikeckennedy.github.io)
+# and does NOT fall back to site_url. Set it explicitly or the sitemap
+# points at the wrong domain.
+seo:
+  canonical:
+    base_url: "https://mkennedy.codes/docs/python-switch/"
+
+repo: https://github.com/mikeckennedy/python-switch
+github_style: widget
+
+# NOTE: this repo's default branch is "master", not "main".
+source: { enabled: true, branch: master, placement: usage }
+
+pypi: true
+
+# GOTCHA: Great Docs defaults mcp.enabled to TRUE, rendering an empty "MCP"
+# tab even when the project ships no MCP server. Disable it.
+mcp:
+  enabled: false
+
+# Author metadata for display in the landing page sidebar
+authors:
+  - name: Michael Kennedy
+    role: Author
+    email: michael@talkpython.fm
+    github: mikeckennedy
+    homepage: https://mkennedy.codes
+
+# API Reference Structure
+# -----------------------
+reference:
+  - title: The switch block
+    desc: >
+      The context manager that gives Python an explicit switch statement.
+      Use it in a `with` block, register cases, then read `result`.
+    contents:
+      - switch
+
+  - title: Range helpers
+    desc: >
+      Helpers for mapping ranges of values to a single case.
+    contents:
+      - closed_range
+
+# Jupyter kernel used by Quarto for any executable code cells.
+jupyter: python3

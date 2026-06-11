@@ -1,0 +1,41 @@
+----------------------------------------------------------------------
+This is the API documentation for the switchlang library.
+----------------------------------------------------------------------
+
+
+## The switch block
+
+The context manager that gives Python an explicit switch statement. Use it in a `with` block, register cases, then read `result`.
+
+
+
+switch(value: Any)
+
+switch is a module-level implementation of the switch statement for Python.
+See https://github.com/mikeckennedy/python-switch for full details.
+Copyright Michael Kennedy (https://mkennedy.codes)
+License: MIT
+
+
+## Range helpers
+
+Helpers for mapping ranges of values to a single case.
+
+
+
+closed_range(start: int, stop: int, step=1) -> range
+
+Creates a closed range that allows you to specify a case
+from [start, stop] inclusively.
+
+```
+    with switch(value) as s:
+        s.case(closed_range(1, 5), lambda: "1-to-5")
+        s.case(closed_range(6, 7), lambda: "6")
+        s.default(lambda: 'default')
+```
+
+:param start: The inclusive lower bound of the range [start, stop].
+:param stop: The inclusive upper bound of the range [start, stop].
+:param step: The step size between elements (defaults to 1).
+:return: A range() generator that has a closed upper bound.

@@ -1,0 +1,207 @@
+[
+  {
+    "objectID": "reference/switch.html",
+    "href": "reference/switch.html",
+    "title": "switch",
+    "section": "",
+    "text": "switch is a module-level implementation of the switch statement for Python.",
+    "crumbs": [
+      "Reference",
+      "The switch block",
+      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+    ]
+  },
+  {
+    "objectID": "reference/switch.html#result",
+    "href": "reference/switch.html#result",
+    "title": "switch",
+    "section": "result",
+    "text": "result\n\nThe value captured from the method called for a given case.\n\n\nresult\n\n\n    value = 4\n    with switch(value) as s:\n        s.case(closed_range(1, 5), lambda: \"1-to-5\")\n        # ...\n\n    res = s.result  # res == '1-to-5'",
+    "crumbs": [
+      "Reference",
+      "The switch block",
+      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+    ]
+  },
+  {
+    "objectID": "reference/switch.html#enter__",
+    "href": "reference/switch.html#enter__",
+    "title": "switch",
+    "section": "__enter__()",
+    "text": "__enter__()\n\nEnter the switch block.\n\n\nUsage\nSource\n\n\n__enter__()\n\n\nReturns\n\n\n\n\nThe switch instance itself (bind it with as s to register cases).",
+    "crumbs": [
+      "Reference",
+      "The switch block",
+      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+    ]
+  },
+  {
+    "objectID": "reference/switch.html#exit__",
+    "href": "reference/switch.html#exit__",
+    "title": "switch",
+    "section": "__exit__()",
+    "text": "__exit__()\n\nRun the matched case (and any fall-through cases) as the block exits.\n\n\nUsage\nSource\n\n\n__exit__(exc_type, exc_val, exc_tb)\n\n\nRaises\n\n\n Exception\n\nIf no case matched the value and no default case was registered.",
+    "crumbs": [
+      "Reference",
+      "The switch block",
+      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+    ]
+  },
+  {
+    "objectID": "reference/switch.html#init__",
+    "href": "reference/switch.html#init__",
+    "title": "switch",
+    "section": "__init__()",
+    "text": "__init__()\n\nCreate a new switch block that tests cases against value.\n\n\nUsage\nSource\n\n\n__init__(value)\n\n\nParameters\n\n\nvalue: typing.Any\n\nThe value each case key is compared against.",
+    "crumbs": [
+      "Reference",
+      "The switch block",
+      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+    ]
+  },
+  {
+    "objectID": "reference/switch.html#case",
+    "href": "reference/switch.html#case",
+    "title": "switch",
+    "section": "case()",
+    "text": "case()\n\nSpecify a case for the switch block:\n\n\nUsage\nSource\n\n\ncase(key, func, fallthrough=False)\n\n\n    with switch(val) as s:\n       s.case('a', function)\n       s.case('b', function, fallthrough=True)\n       s.default(function)\n\n\nParameters\n\n\nkey: typing.Any\n\nKey for the case test (if this is a list or range, the items will each be added as a case)\n\nfunc: typing.Callable[[], typing.Any]\n\nAny callable taking no parameters to be executed if this case matches.\n\nfallthrough: typing.Optional[bool] = False\n\nOptionally fall through to the subsequent case (defaults to False)\n\n\n\n\n\nReturns\n\n\n\n\nTrue if this case matched the switch value, otherwise None.",
+    "crumbs": [
+      "Reference",
+      "The switch block",
+      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+    ]
+  },
+  {
+    "objectID": "reference/switch.html#default",
+    "href": "reference/switch.html#default",
+    "title": "switch",
+    "section": "default()",
+    "text": "default()\n\nUse as option final statement in switch block.\n\n\nUsage\nSource\n\n\ndefault(func)\n\n\n    with switch(val) as s:\n       s.case(...)\n       s.case(...)\n       s.default(function)\n\n\nParameters\n\n\nfunc: typing.Callable[[], typing.Any]\n\nAny callable taking no parameters to be executed if this (default) case matches.\n\n\n\n\n\nReturns\n\n\n\n\nNone",
+    "crumbs": [
+      "Reference",
+      "The switch block",
+      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+    ]
+  },
+  {
+    "objectID": "reference/closed_range.html",
+    "href": "reference/closed_range.html",
+    "title": "closed_range()",
+    "section": "",
+    "text": "Creates a closed range that allows you to specify a case\n\n\nUsage\nSource\n\n\nclosed_range(start, stop, step=1)\n\n\nfrom [start, stop] inclusively.\n    with switch(value) as s:\n        s.case(closed_range(1, 5), lambda: \"1-to-5\")\n        s.case(closed_range(6, 7), lambda: \"6\")\n        s.default(lambda: 'default')\n\n\nParameters\n\n\nstart: int\n\nThe inclusive lower bound of the range [start, stop].\n\nstop: int\n\nThe inclusive upper bound of the range [start, stop].\n\nstep=1\n\nThe step size between elements (defaults to 1).\n\n\n\n\n\nReturns\n\n\n range\n\nA range() generator that has a closed upper bound.",
+    "crumbs": [
+      "Reference",
+      "Range helpers",
+      "[closed_range()]{.doc-object-name .doc-function .doc-label .doc-label-function}"
+    ]
+  },
+  {
+    "objectID": "skills.html",
+    "href": "skills.html",
+    "title": "Skills",
+    "section": "",
+    "text": "A skill is a package of structured files that teaches an AI coding agent how to work with a specific tool or framework. The skill below was generated by Great Docs from this project’s documentation. Install it in your agent and it will be able to run commands, edit configuration, write content, and troubleshoot problems without step-by-step guidance from you.\n\n  \n    ▶    Install this skill\n  \n  \n    \n      \nAny agent — install with npx:\nnpx skills add https://mkennedy.codes/docs/python-switch/\nCodex / OpenCode\nTell the agent:Fetch the skill file at https://mkennedy.codes/docs/python-switch/skill.md and follow the instructions.\nManual — download the skill file:\ncurl -O https://mkennedy.codes/docs/python-switch/skill.md\nOr browse the SKILL.md file.\n      \n    \n  \n\n\nSKILL.md\n---\nname: switchlang\ndescription: &gt;\n  Adds switch blocks to the Python language. Use when writing Python code that uses the switchlang package.\nlicense: MIT\ncompatibility: Requires Python &gt;=3.9.\n---\n\n# switchlang\n\nAdds switch blocks to the Python language.\n\n## Installation\n\n```bash\npip install switchlang\n```\n\n## API overview\n\n### The switch block\n\nThe context manager that gives Python an explicit switch statement. Use it in a `with` block, register cases, then read `result`.\n\n\n- `switch`: switch is a module-level implementation of the switch statement for Python\n\n### Range helpers\n\nHelpers for mapping ranges of values to a single case.\n\n\n- `closed_range`: Creates a closed range that allows you to specify a case\n\n## Resources\n\n- [Full documentation](https://mkennedy.codes/docs/python-switch/)\n- [llms.txt](llms.txt) — Indexed API reference for LLMs\n- [llms-full.txt](llms-full.txt) — Comprehensive documentation for LLMs\n- [Source code](https://github.com/mikeckennedy/python-switch)"
+  },
+  {
+    "objectID": "changelog.html",
+    "href": "changelog.html",
+    "title": "Changelog",
+    "section": "",
+    "text": "This changelog is generated automatically from GitHub Releases.\n\nv0.1.1\n2025-09-11 · GitHub\nRefactor codebase for consistent double‑quoted strings and add type hints\nThis update replaces single‑quoted literals with double quotes throughout the repository, standardizes string formatting in setup.py, __init__.py, and test files, and introduces comprehensive type annotations to improve readability and static analysis support. The changes also clean up import statements, adjust exception messages for clarity, and ensure the package metadata uses consistent quoting conventions. 🚀\nSolves potential type warning on s.result."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "switchlang",
+    "section": "",
+    "text": "View on PyPI Browse source code Issues Pypi Funding\n\n\n\nSkills llms.txt llms-full.txt\n\n\n\n\n\n\nMichael Kennedy\n\n\n\nAuthor\n\n  \n\n\n\n\nFull license MIT\n\n\n\nRequires: Python &gt;=3.9 Provides-Extra: dev"
+  },
+  {
+    "objectID": "index.html#example",
+    "href": "index.html#example",
+    "title": "switchlang",
+    "section": "Example",
+    "text": "Example\nfrom switchlang import switch\n\ndef main():\n    num = 7\n    val = input(\"Enter a character, a, b, c or any other: \")\n\n    with switch(val) as s:\n        s.case('a', process_a)\n        s.case('b', lambda: process_with_data(val, num, 'other values still'))\n        s.default(process_any)\n    \ndef process_a():\n    print(\"Found A!\")\n    \ndef process_any():\n    print(\"Found Default!\")\n    \ndef process_with_data(*value):\n    print(\"Found with data: {}\".format(value))\n\nmain()"
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "switchlang",
+    "section": "Installation",
+    "text": "Installation\nSimply install via pip:\npip install switchlang"
+  },
+  {
+    "objectID": "index.html#features",
+    "href": "index.html#features",
+    "title": "switchlang",
+    "section": "Features",
+    "text": "Features\n\nMore explicit than using dictionaries with functions as values.\nVerifies the signatures of the methods\nSupports default case\nChecks for duplicate keys / cases\nKeys can be anything hashable (numbers, strings, objects, etc.)\nSupports “fall-through” cases (opt-in with fallthrough=True)\nUse range and list for multiple cases mapped to a single action"
+  },
+  {
+    "objectID": "index.html#multiple-cases-one-action",
+    "href": "index.html#multiple-cases-one-action",
+    "title": "switchlang",
+    "section": "Multiple cases, one action",
+    "text": "Multiple cases, one action\nYou can map ranges and lists of cases to a single action as follows:\n## with lists:\nvalue = 4  # matches even number case\n\nwith switch(value) as s:\n    s.case([1, 3, 5, 7], lambda: ...)\n    s.case([0, 2, 4, 6, 8], lambda: ...)\n    s.default(lambda: ...)\n## with ranges:\nvalue = 4  # matches first case\n\nwith switch(value) as s:\n    s.case(range(1, 6), lambda: ...)\n    s.case(range(6, 10), lambda: ...)\n    s.default(lambda: ...)"
+  },
+  {
+    "objectID": "index.html#closed-vs.-open-ranges",
+    "href": "index.html#closed-vs.-open-ranges",
+    "title": "switchlang",
+    "section": "Closed vs. Open ranges",
+    "text": "Closed vs. Open ranges\nLooking at the above code it’s a bit weird that 6 appears at the end of one case, beginning of the next. But range() is half open/closed.\nTo handle the inclusive case, I’ve added closed_range(start, stop). For example, closed_range(1,5) -&gt; [1,2,3,4,5]"
+  },
+  {
+    "objectID": "index.html#why-not-just-raw-dict",
+    "href": "index.html#why-not-just-raw-dict",
+    "title": "switchlang",
+    "section": "Why not just raw dict?",
+    "text": "Why not just raw dict?\nThe biggest push back on this idea is that we already have this problem solved. You write the following code.\nswitch = {\n    1: method_on_one,\n    2: method_on_two,\n    3: method_three\n}\n\nresult = switch.get(value, default_method_to_run)()\nThis works but is very low on the functionality level. We have a better solution here I believe. Let’s take this example and see how it looks in python-switch vs raw dicts:\n## with python-switch:\n\nwhile True:\n    action = get_action(action)\n\n    with switch(action) as s:\n        s.case(['c', 'a'], create_account)\n        s.case('l', log_into_account)\n        s.case('r', register_cage)\n        s.case('u', update_availability)\n        s.case(['v', 'b'], view_bookings)\n        s.case('x', exit_app)\n        s.case('', lambda: None)\n        s.case(range(1,6), lambda: set_level(action))\n        s.default(unknown_command)\n    \n    print('Result is {}'.format(s.result))\nNow compare that to the espoused pythonic way:\n## with raw dicts\n\nwhile True:\n    action = get_action(action)\n\n    switch = {\n        'c': create_account,\n        'a': create_account,\n        'l': log_into_account,\n        'r': register_cage,\n        'u': update_availability,\n        'v': view_bookings,\n        'b': view_bookings,\n        'x': exit_app,\n        1: lambda: set_level(action),\n        2: lambda: set_level(action),\n        3: lambda: set_level(action),\n        4: lambda: set_level(action),\n        5: lambda: set_level(action),\n        '': lambda: None,\n    }\n    result = switch.get(action, unknown_command)()\n    print('Result is {}'.format(result))\nPersonally, I much prefer to read and write the one above. That’s why I wrote this module. It seems to convey the intent of switch way more than the dict. But either are options."
+  },
+  {
+    "objectID": "index.html#why-not-just-if-elif-else",
+    "href": "index.html#why-not-just-if-elif-else",
+    "title": "switchlang",
+    "section": "Why not just if / elif / else?",
+    "text": "Why not just if / elif / else?\nAnother push back on this idea is that we already have this problem solved. Switch statements are really if / elif / else blocks. So you write the following code.\n## with if / elif / else\n\nwhile True:\n    action = get_action(action)\n\n    if action == 'c' or action == 'a':\n        result = create_account()\n    elif action == 'l':\n        result = log_into_account()\n    elif action == 'r':\n        result = register_cage()\n    elif action == 'a':\n        result = update_availability()\n    elif action == 'v' or action == 'b':\n        result = view_bookings()\n    elif action == 'x':\n        result = exit_app()\n    elif action in {1, 2, 3, 4, 5}:\n        result = set_level(action)\n    else:\n        unknown_command()\n        \n    print('Result is {}'.format(result))\nI actually believe this is a little better than the raw dict option. But there are still things that are harder.\n\nHow would you deal with fall-through cleanly?\nDid you notice the bug? We forgot to set result in default case (else) and will result in a runtime error (but only if that case hits).\nThere is another bug. update_availability will never run because its command (a) is bound to two cases. This is guarded against in switch and you would receive a duplicate case error the first time it runs at all.\nWhile it’s pretty clear, it’s much more verbose and less declarative than the switch version.\n\nAgain, compare the if / elif / else to what you have with switch. This code is identical except doesn’t have the default case bug.\nwhile True:\n    action = get_action(action)\n\n    with switch(action) as s:\n        s.case(['c', 'a'], create_account)\n        s.case('l', log_into_account)\n        s.case('r', register_cage)\n        s.case('u', update_availability)\n        s.case(['v', 'b'], view_bookings)\n        s.case('x', exit_app)\n        s.case('', lambda: None)\n        s.case(range(1,6), lambda: set_level(action))\n        s.default(unknown_command)\n    \n    print('Result is {}'.format(s.result))"
+  },
+  {
+    "objectID": "skill.html",
+    "href": "skill.html",
+    "title": "switchlang",
+    "section": "",
+    "text": "Adds switch blocks to the Python language."
+  },
+  {
+    "objectID": "skill.html#the-switch-block",
+    "href": "skill.html#the-switch-block",
+    "title": "switchlang",
+    "section": "The switch block",
+    "text": "The switch block\nThe context manager that gives Python an explicit switch statement. Use it in a with block, register cases, then read result.\n\nswitch: switch is a module-level implementation of the switch statement for Python"
+  },
+  {
+    "objectID": "skill.html#range-helpers",
+    "href": "skill.html#range-helpers",
+    "title": "switchlang",
+    "section": "Range helpers",
+    "text": "Range helpers\nHelpers for mapping ranges of values to a single case.\n\nclosed_range: Creates a closed range that allows you to specify a case"
+  },
+  {
+    "objectID": "license.html",
+    "href": "license.html",
+    "title": "License",
+    "section": "",
+    "text": "▶\n    License features — MIT License\n\n\n\n\n\nPermissions\n\nCommercial use\nModification\nDistribution\nPrivate use\n\n\nConditions\n\nLicense and copyright notice\n\n\nLimitations\n\nLiability\nWarranty\n\n\n\n\nMIT License\n\nCopyright (c) 2017 Michael Kennedy\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE."
+  },
+  {
+    "objectID": "reference/index.html",
+    "href": "reference/index.html",
+    "title": "Reference",
+    "section": "",
+    "text": "The switch block\n\nThe context manager that gives Python an explicit switch statement. Use it in a with block, register cases, then read result.\n\n\nswitch\n\nswitch is a module-level implementation of the switch statement for Python.\n\n\n\n\nRange helpers\n\nHelpers for mapping ranges of values to a single case.\n\n\nclosed_range()\n\nCreates a closed range that allows you to specify a case",
+    "crumbs": [
+      "Reference",
+      "API Index"
+    ]
+  }
+]

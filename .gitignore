@@ -100,3 +100,8 @@ ENV/
 # mypy
 .mypy_cache/
 .idea
+
+great-docs/
+.ruff_cache/
+.pytest_cache/
+docs/build-timings.json

@@ -1,5 +1,6 @@
 import unittest
-from switchlang import switch, closed_range
+
+from switchlang import closed_range, switch
 
 
 # here is a custom type we can use as a key for our tests

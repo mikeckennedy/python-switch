@@ -14,6 +14,11 @@ class switch:
     __default: typing.Any = uuid.uuid4()
 
     def __init__(self, value: typing.Any):
+        """
+        Create a new switch block that tests cases against `value`.
+
+        :param value: The value each case key is compared against.
+        """
         self.value = value
         self.cases: typing.Set[typing.Any] = set()
         self._found = False
@@ -56,7 +61,7 @@ class switch:
         :param key: Key for the case test (if this is a list or range, the items will each be added as a case)
         :param func: Any callable taking no parameters to be executed if this case matches.
         :param fallthrough: Optionally fall through to the subsequent case (defaults to False)
-        :return:
+        :return: True if this case matched the switch value, otherwise None.
         """
         if fallthrough is not None:
             if self._falling_through:
@@ -96,9 +101,19 @@ class switch:
             return True
 
     def __enter__(self):
+        """
+        Enter the switch block.
+
+        :return: The switch instance itself (bind it with `as s` to register cases).
+        """
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Run the matched case (and any fall-through cases) as the block exits.
+
+        :raises Exception: If no case matched the value and no default case was registered.
+        """
         if exc_val:
             raise exc_val
 
