@@ -41,6 +41,17 @@ class CoreTests(unittest.TestCase):
 
         self.assertEqual(s.result, 'default')
 
+    def test_default_before_matching_case_runs_both(self):
+        # documented quirk: ordering is not enforced, so a default registered
+        # before a matching case runs as well; this is why default belongs last
+        visited = []
+        with switch(2) as s:
+            s.default(lambda: visited.append('default') or 'default')
+            s.case(2, lambda: visited.append(2) or 2)
+
+        self.assertEqual(s.result, 2)
+        self.assertEqual(visited, ['default', 2])
+
     def test_none_as_valid_case(self):
         with switch(None) as s:
             s.case(1, lambda: 'one')
@@ -60,6 +71,30 @@ class CoreTests(unittest.TestCase):
             with switch('val') as s:
                 s.case(1, lambda: None)
                 s.case(1, lambda: None)
+
+    def test_error_case_action_not_callable(self):
+        with self.assertRaises(ValueError):
+            with switch(1) as s:
+                s.case(1, None)
+
+        with self.assertRaises(ValueError):
+            with switch(1) as s:
+                s.case(1, 'not callable')
+
+    def test_exception_in_block_propagates(self):
+        visited = []
+        with self.assertRaises(RuntimeError):
+            with switch(1) as s:
+                s.case(1, lambda: visited.append(1) or 1)
+                raise RuntimeError('error inside the with block')
+
+        # the error aborts the switch: no case actions run
+        self.assertEqual(visited, [])
+
+    def test_exception_in_case_action_propagates(self):
+        with self.assertRaises(ZeroDivisionError):
+            with switch(1) as s:
+                s.case(1, lambda: 1 / 0)
 
     def test_multiple_values_one_case_range(self):
         for value in range(1, 5):
@@ -124,6 +159,13 @@ class CoreTests(unittest.TestCase):
 
         self.assertIs(s.result, obj)
 
+    def test_none_as_valid_result(self):
+        # the sentinel must separate 'computed None' from 'computed nothing'
+        with switch(1) as s:
+            s.case(1, lambda: None)
+
+        self.assertIsNone(s.result)
+
     def test_closed_range(self):
         for value in [1, 2, 3, 4, 5]:
             with switch(value) as s:
@@ -168,6 +210,22 @@ class CoreTests(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             closed_range(1, 10, -2)
+
+    def test_closed_range_invalid_bounds(self):
+        with self.assertRaises(ValueError):
+            closed_range(5, 1)
+
+        # start must be strictly less than stop: one-element ranges are rejected
+        with self.assertRaises(ValueError):
+            closed_range(3, 3)
+
+    def test_adjacent_closed_ranges_are_duplicates(self):
+        # closed_range(1, 5) and closed_range(5, 9) both contain 5: unlike
+        # plain ranges, adjacent closed ranges overlap and are duplicate cases
+        with self.assertRaises(ValueError):
+            with switch(3) as s:
+                s.case(closed_range(1, 5), lambda: 'low')
+                s.case(closed_range(5, 9), lambda: 'high')
 
     def test_fallthrough_simple(self):
         visited = []
