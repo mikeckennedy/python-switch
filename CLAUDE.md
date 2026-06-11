@@ -152,14 +152,29 @@ Coding constraints — match the existing style:
 ## Versioning and release
 
 - The version of record is `[project].version` in [pyproject.toml](pyproject.toml)
-  (currently `0.1.2`). `__version__` is read at runtime from installed package
+  (currently `0.1.3`). `__version__` is read at runtime from installed package
   metadata via `importlib.metadata`, falling back to `'0.0.0'` when not installed.
   Because it reflects *installed* metadata, after a bump you must reinstall
   (`uv pip install -e .`) before `__version__` or the introspected docs show the new
   number. `uv.lock` is gitignored, so there is no committed lockfile.
+  - **Gotcha:** a stale `switchlang.egg-info/` in the repo root (left by an old
+    `setup.py`-era build) shadows the venv's `*.dist-info` on `sys.path` and makes
+    `importlib.metadata` report an old version no matter what you reinstall. If
+    `__version__` looks wrong, `rm -rf switchlang.egg-info` (it's gitignored).
+- To cut a release: bump `[project].version`, rename `## [Unreleased]` in
+  `CHANGELOG.md` to `## [X.Y.Z] - <date>` (add a fresh empty `[Unreleased]` and a
+  new compare-link line in the footer), reinstall, then rebuild docs. The docs
+  **version badge** comes from PyPI (`pypi: true`), so it shows the latest
+  *published* release and only updates to the new version after you publish to PyPI
+  and rebuild — it legitimately lags during a release.
 - Build backend is **hatchling**; the wheel packages the `switchlang/` directory.
-- The changelog ([docs/changelog.md](docs/changelog.md)) is generated from GitHub
-  Releases — don't hand-maintain it.
+- The changelog is **hand-maintained** in the repo-root [CHANGELOG.md](CHANGELOG.md)
+  ([Keep a Changelog](https://keepachangelog.com/) format). Record every
+  user-facing change there under the `## [Unreleased]` heading; on release, rename
+  that heading to the new version. The docs site renders this file —
+  `scripts/build_docs.py` stages `CHANGELOG.md` into `changelog/index.qmd` before
+  each build (configured in `great-docs.yml`), so the generated `docs/changelog/`
+  output is **not** a source you edit.
 
 ## Documentation pipeline
 
@@ -189,6 +204,7 @@ sources and rebuild rather than hand-editing them.
 2. Update/extend [tests/test_core.py](tests/test_core.py) and run
    `uv run python -m unittest discover -s tests`.
 3. Keep docstrings + [README.md](README.md) in sync with the new behavior.
-4. `uvx ruff format . && uvx ruff check .`
-5. If docs-visible, rebuild: `uv run --extra dev python scripts/build_docs.py`.
-6. Bump `[project].version` in [pyproject.toml](pyproject.toml) if releasing.
+4. Add a `## [Unreleased]` entry to [CHANGELOG.md](CHANGELOG.md) for any user-facing change.
+5. `uvx ruff format . && uvx ruff check .`
+6. If docs-visible, rebuild: `uv run --extra dev python scripts/build_docs.py`.
+7. Bump `[project].version` in [pyproject.toml](pyproject.toml) if releasing.

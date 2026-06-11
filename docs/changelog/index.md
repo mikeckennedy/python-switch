@@ -5,7 +5,15 @@ All notable changes to **switchlang** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-# [Unreleased](https://github.com/mikeckennedy/python-switch/compare/v0.1.2...HEAD)
+# [Unreleased](https://github.com/mikeckennedy/python-switch/compare/v0.1.3...HEAD)
+
+
+# [0.1.3](https://github.com/mikeckennedy/python-switch/compare/v0.1.2...v0.1.3) - 2026-06-11
+
+
+## Fixed
+
+- **An exception raised inside the `with` block now always aborts the switch, even when the exception object is falsy.** [__exit__](../reference/switch.md#switchlang.switch.__exit__) guarded its re-raise with `if exc_val:`, a truthiness test that invokes the exception's `__bool__`/`__len__`. An exception whose `__bool__` returned `False` slipped past the guard, so the matched case action ran before the exception propagated. The guard now tests `exc_val is not None`, restoring the documented "no case actions run on exception" guarantee for every exception type. ([\#15](https://github.com/mikeckennedy/python-switch/issues/15))
 
 
 # [0.1.2](https://github.com/mikeckennedy/python-switch/compare/v0.1.1...v0.1.2) - 2026-06-11
