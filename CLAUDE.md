@@ -90,9 +90,9 @@ Validation (all raise on registration/exit):
 - `closed_range` with `start >= stop` or `step < 1` -> `ValueError`.
 - No case matched **and** no `default()` registered -> `Exception` on block exit.
 - An **exception raised inside the `with` block** propagates and aborts the switch:
-  `__exit__` re-raises it before any case actions run, so for a normal exception
-  **no case actions run**. (One sharp edge — see *Implementation notes* — the guard
-  is a truthiness check, so an exception whose `__bool__` is falsy slips past it.)
+  `__exit__` re-raises it before any case actions run, so **no case actions run**.
+  This holds for any exception (the guard is `if exc_val is not None:`, so an
+  exception whose `__bool__` is falsy still aborts — see *Implementation notes*).
 
 ## Implementation notes (don't refactor naively)
 
@@ -106,11 +106,10 @@ Validation (all raise on registration/exit):
   rename the class or hoist these to module level, and **keep the `result` check
   identity-based** (`is`, not `==`); that identity check is what stops a result with
   a permissive `__eq__` (e.g. a NumPy array) from being read as "no result."
-- `__exit__` guards exception re-raise with `if exc_val:` (truthiness), not
-  `is not None`. For normal exceptions this is correct, but an exception whose
-  `__bool__`/`__len__` is falsy slips past the guard and the matched case runs
-  before the exception propagates. A latent sharp edge — switch to
-  `if exc_val is not None:` if you want the guarantee to be absolute.
+- `__exit__` guards exception re-raise with `if exc_val is not None:` — an identity
+  check, **not** truthiness. This is deliberate (fixed in #15): testing
+  `if exc_val:` would invoke the exception's `__bool__`/`__len__`, so a falsy
+  exception would slip past and let the matched case run. Keep it `is not None`.
 
 ## Development workflow
 

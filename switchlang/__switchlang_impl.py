@@ -135,7 +135,9 @@ class switch:
 
         :raises Exception: If no case matched the value and no default case was registered.
         """
-        if exc_val:
+        # Test for the presence of an exception, not its truthiness: an exception
+        # whose __bool__/__len__ is falsy must still abort the switch (see #15).
+        if exc_val is not None:
             raise exc_val
 
         if not self._func_stack:

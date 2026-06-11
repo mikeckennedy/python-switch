@@ -91,6 +91,22 @@ class CoreTests(unittest.TestCase):
         # the error aborts the switch: no case actions run
         self.assertEqual(visited, [])
 
+    def test_falsy_exception_in_block_still_aborts(self):
+        # regression for #15: __exit__ must test `exc_val is not None`, not its
+        # truthiness, so an exception whose __bool__ is falsy still aborts the
+        # switch (re-raises and runs no case actions)
+        class FalsyError(Exception):
+            def __bool__(self):
+                return False
+
+        visited = []
+        with self.assertRaises(FalsyError):
+            with switch(1) as s:
+                s.case(1, lambda: visited.append(1) or 1)
+                raise FalsyError('error inside the with block')
+
+        self.assertEqual(visited, [])
+
     def test_exception_in_case_action_propagates(self):
         with self.assertRaises(ZeroDivisionError):
             with switch(1) as s:

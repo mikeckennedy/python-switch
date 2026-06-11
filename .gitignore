@@ -106,3 +106,6 @@ great-docs/
 .pytest_cache/
 docs/build-timings.json
 uv.lock
+
+# Great Docs "Changelog" section, staged from CHANGELOG.md by scripts/build_docs.py
+/changelog/

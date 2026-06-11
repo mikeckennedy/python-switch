@@ -16,9 +16,38 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent  # pyproject.toml + great-docs.yml live here
 SITE = REPO_ROOT / 'great-docs' / '_site'
 DEST = REPO_ROOT / 'docs'
+CHANGELOG = REPO_ROOT / 'CHANGELOG.md'  # hand-maintained, single source of truth
+CHANGELOG_SECTION = REPO_ROOT / 'changelog'  # great-docs "Changelog" section (gitignored, staged here)
+
+
+def stage_changelog() -> None:
+    """Render the repo-root CHANGELOG.md into the great-docs "Changelog" section.
+
+    Great Docs has no "source the changelog from a file" option — its built-in
+    changelog is generated from GitHub Releases (disabled in great-docs.yml).
+    So we treat CHANGELOG.md as the single source of truth and stage it into a
+    one-page section (changelog/index.qmd) on every build. The leading "# Changelog"
+    H1 is dropped in favor of a real page title + a version-level table of contents.
+    """
+    if not CHANGELOG.is_file():
+        print(f'CHANGELOG.md not found at {CHANGELOG}, skipping changelog section', file=sys.stderr)
+        return
+
+    body = CHANGELOG.read_text(encoding='utf-8')
+    lines = body.splitlines()
+    if lines and lines[0].lstrip().startswith('# '):  # drop the top-level "# Changelog" heading
+        lines = lines[1:]
+    body = '\n'.join(lines).lstrip('\n')
+
+    front_matter = '---\ntitle: "Changelog"\ntoc: true\ntoc-depth: 2\n---\n\n'
+    CHANGELOG_SECTION.mkdir(parents=True, exist_ok=True)
+    (CHANGELOG_SECTION / 'index.qmd').write_text(front_matter + body, encoding='utf-8')
+    print(f'Staged CHANGELOG.md -> {CHANGELOG_SECTION / "index.qmd"}')
 
 
 def main() -> int:
+    stage_changelog()
+
     # Prefer the great-docs entry point that lives next to this interpreter (the venv's).
     great_docs = Path(sys.executable).with_name('great-docs')
     cmd = [str(great_docs) if great_docs.exists() else 'great-docs', 'build']

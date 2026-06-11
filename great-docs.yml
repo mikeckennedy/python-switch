@@ -45,6 +45,21 @@ include_in_header:
   - text: |
       <script async src="https://uma.mkennedy.codes/script.js" data-website-id="fc9b6770-3b44-4073-944e-4a4f0e79f66a"></script>
 
+# Changelog is hand-maintained in the repo-root CHANGELOG.md (Keep a Changelog
+# format) — that file is the single source of truth, NOT GitHub Releases.
+# Disable Great Docs' release-driven changelog and render CHANGELOG.md instead
+# via the "Changelog" section below; scripts/build_docs.py stages the file into
+# changelog/index.qmd before each build.
+changelog:
+  enabled: false
+
+# Custom sections. The Changelog section renders the staged CHANGELOG.md as a
+# first-class page with its own navbar link (placed after the API Reference).
+sections:
+  - title: Changelog
+    dir: changelog
+    navbar_after: Reference
+
 # Author metadata for display in the landing page sidebar
 authors:
   - name: Michael Kennedy
