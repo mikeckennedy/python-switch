@@ -23,14 +23,14 @@ pip install switchlang
 The context manager that gives Python an explicit switch statement. Use it in a `with` block, register cases, then read `result`.
 
 
-- `switch`: switch is a module-level implementation of the switch statement for Python
+- `switch`: An explicit switch statement for Python, implemented as a context manager
 
 ### Range helpers
 
 Helpers for mapping ranges of values to a single case.
 
 
-- `closed_range`: Creates a closed range that allows you to specify a case
+- `closed_range`: Create a closed range for a case: both `start` and `stop` are included
 
 ## Resources
 

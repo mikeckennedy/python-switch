@@ -110,7 +110,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../theme-init.js"></script>
 
 
-  <meta name="description" content="switch is a module-level implementation of the switch statement for Python.">
+  <meta name="description" content="An explicit switch statement for Python, implemented as a context manager.">
   <script type="application/ld+json">
 [
   {
@@ -141,12 +141,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </script>
   <meta property="og:type" content="website">
   <meta property="og:title" content="switch – switchlang | switchlang">
-  <meta property="og:description" content="switch is a module-level implementation of the switch statement for Python.">
+  <meta property="og:description" content="An explicit switch statement for Python, implemented as a context manager.">
   <meta property="og:url" content="https://mkennedy.codes/docs/python-switch/reference/switch.html">
   <meta property="og:site_name" content="switchlang">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="switch – switchlang | switchlang">
-  <meta name="twitter:description" content="switch is a module-level implementation of the switch statement for Python.">
+  <meta name="twitter:description" content="An explicit switch statement for Python, implemented as a context manager.">
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
@@ -157,7 +157,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../index.html">
-    <span class="navbar-title">switchlang</span>
+    <span class="navbar-title">switchlang <span class="version-badge" title="Released 2025-09-11">v0.1.1</span></span>
     </a>
   </div>
             <div id="quarto-search" class=""></div>
@@ -286,16 +286,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>switch is a module-level implementation of the switch statement for Python.</p>
+<p>An explicit switch statement for Python, implemented as a context manager.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L5-L146" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L9-L171" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.CLASS">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">switch</span>()</span></code></pre></div>
 </div>
 <div class="doc-text">
+<p>Use it in a <code>with</code> block: register cases with <a href="switch.html#switchlang.switch.case" class="gdls-link gdls-code">case()</a> and <a href="switch.html#switchlang.switch.default" class="gdls-link gdls-code">default()</a>, then read the matched case’s return value from <a href="switch.html#switchlang.switch.result" class="gdls-link gdls-code">result</a>.</p>
 <p>See https://github.com/mikeckennedy/python-switch for full details. Copyright Michael Kennedy (https://mkennedy.codes) License: MIT</p>
 </div>
 <section id="attributes" class="level2 doc-attributes">
@@ -317,7 +318,7 @@ Description
 <a href="#result" class="doc-attribute doc-label doc-label-property">result</a>
 </td>
 <td>
-The value captured from the method called for a given case.
+The value returned by the function of the matched case.
 </td>
 </tr>
 </tbody>
@@ -326,12 +327,13 @@ The value captured from the method called for a given case.
 <section id="result" class="level3">
 <h4 class="anchored" data-anchor-id="result"><span class="doc-object-name doc-attribute doc-label doc-label-property">result</span></h4>
 <div class="doc-subject">
-<p>The value captured from the method called for a given case.</p>
+<p>The value returned by the function of the matched case.</p>
 </div>
 <div class="doc-signature doc-attribute">
-<p><code><span class="doc-parameter-name">result</span></code></p>
+<p><code><span class="doc-parameter-name">result</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></p>
 </div>
 <div class="doc-text">
+<p>When cases fall through, <a href="switch.html#switchlang.switch.result" class="gdls-link gdls-code">result</a> is the return value of the last function executed.</p>
 <pre><code>    value = 4
     with switch(value) as s:
         s.case(closed_range(1, 5), lambda: "1-to-5")
@@ -339,6 +341,17 @@ The value captured from the method called for a given case.
 
     res = s.result  # res == '1-to-5'</code></pre>
 </div>
+<section id="raises" class="level4 doc-raises">
+<h5 class="doc-raises anchored" data-anchor-id="raises">Raises</h5>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">Exception</span></code></dt>
+<dd>
+If accessed before the switch block has exited and computed a result.
+</dd>
+</dl>
+</div>
+</section>
 </section>
 </section>
 <section id="methods" class="level2 doc-methods">
@@ -384,7 +397,7 @@ Create a new switch block that tests cases against <code>value</code>.
 <a href="#case" class="doc-function doc-label doc-label-method">case()</a>
 </td>
 <td>
-Specify a case for the switch block:
+Register a case for the switch block:
 </td>
 </tr>
 <tr>
@@ -392,7 +405,7 @@ Specify a case for the switch block:
 <a href="#default" class="doc-function doc-label doc-label-method">default()</a>
 </td>
 <td>
-Use as option final statement in switch block.
+Register the default case: the action to run when no other case matches.
 </td>
 </tr>
 </tbody>
@@ -405,7 +418,7 @@ Use as option final statement in switch block.
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L103-L109" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L119-L125" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">__enter__</span>()</span></code></pre></div>
@@ -414,7 +427,7 @@ Use as option final statement in switch block.
 <h5 class="doc-returns anchored" data-anchor-id="returns">Returns</h5>
 <div class="doc-definition-items">
 <dl>
-<dt><code></code></dt>
+<dt><code> <span class="doc-parameter-annotation">switch</span></code></dt>
 <dd>
 The switch instance itself (bind it with <code>as s</code> to register cases).
 </dd>
@@ -430,13 +443,13 @@ The switch instance itself (bind it with <code>as s</code> to register cases).
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L111-L125" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L127-L146" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">__exit__</span>(exc_type, exc_val, exc_tb)</span></code></pre></div>
 </div>
-<section id="raises" class="level4 doc-raises">
-<h5 class="doc-raises anchored" data-anchor-id="raises">Raises</h5>
+<section id="raises-1" class="level4 doc-raises">
+<h5 class="doc-raises anchored" data-anchor-id="raises-1">Raises</h5>
 <div class="doc-definition-items">
 <dl>
 <dt><code> <span class="doc-parameter-annotation">Exception</span></code></dt>
@@ -455,7 +468,7 @@ If no case matched the value and no default case was registered.
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L16-L27" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L24-L35" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">__init__</span>(value)</span></code></pre></div>
@@ -464,7 +477,7 @@ If no case matched the value and no default case was registered.
 <h5 class="doc-parameters anchored" data-anchor-id="parameters">Parameters</h5>
 <div class="doc-definition-items">
 <dl>
-<dt><code><span class="doc-parameter-name">value</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">typing.Any</span></code></dt>
+<dt><code><span class="doc-parameter-name">value</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
 The value each case key is compared against.
 </dd>
@@ -476,11 +489,11 @@ The value each case key is compared against.
 <section id="case" class="level3">
 <h4 class="anchored" data-anchor-id="case"><span class="doc-object-name doc-function doc-label doc-label-method">case()</span></h4>
 <div class="doc-subject">
-<p>Specify a case for the switch block:</p>
+<p>Register a case for the switch block:</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L45-L101" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L57-L117" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>case(key, func, fallthrough<span class="op">=</span><span class="va">False</span>)</span></code></pre></div>
@@ -495,17 +508,17 @@ The value each case key is compared against.
 <h5 class="doc-parameters anchored" data-anchor-id="parameters-1">Parameters</h5>
 <div class="doc-definition-items">
 <dl>
-<dt><code><span class="doc-parameter-name">key</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">typing.Any</span></code></dt>
+<dt><code><span class="doc-parameter-name">key</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Any</span></code></dt>
 <dd>
-<p>Key for the case test (if this is a list or range, the items will each be added as a case)</p>
+<p>Key for the case test. If this is a list or range, each item is added as a case for <code>func</code>.</p>
 </dd>
-<dt><code><span class="doc-parameter-name">func</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">typing.Callable[[], typing.Any]</span></code></dt>
+<dt><code><span class="doc-parameter-name">func</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable[[], Any]</span></code></dt>
 <dd>
-<p>Any callable taking no parameters to be executed if this case matches.</p>
+<p>Any callable taking no parameters, executed if this case matches.</p>
 </dd>
-<dt><code><span class="doc-parameter-name">fallthrough</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">typing.Optional[bool]</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
+<dt><code><span class="doc-parameter-name">fallthrough</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">bool | None</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="va">False</span></span></code></dt>
 <dd>
-Optionally fall through to the subsequent case (defaults to False)
+Optionally fall through to the subsequent case (defaults to False). <code>None</code> is reserved for internal use and leaves the fall-through state unchanged.
 </dd>
 </dl>
 </div>
@@ -514,9 +527,20 @@ Optionally fall through to the subsequent case (defaults to False)
 <h5 class="doc-returns anchored" data-anchor-id="returns-1">Returns</h5>
 <div class="doc-definition-items">
 <dl>
-<dt><code></code></dt>
+<dt><code> <span class="doc-parameter-annotation">bool</span></code></dt>
 <dd>
-True if this case matched the switch value, otherwise None.
+True if this case (or any item of a list or range key) matched the switch value, otherwise False.
+</dd>
+</dl>
+</div>
+</section>
+<section id="raises-2" class="level4 doc-raises">
+<h5 class="doc-raises anchored" data-anchor-id="raises-2">Raises</h5>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
+<dd>
+If the key is a duplicate, the key is an empty collection, or func is not callable.
 </dd>
 </dl>
 </div>
@@ -526,16 +550,17 @@ True if this case matched the switch value, otherwise None.
 <section id="default" class="level3">
 <h4 class="anchored" data-anchor-id="default"><span class="doc-object-name doc-function doc-label doc-label-method">default()</span></h4>
 <div class="doc-subject">
-<p>Use as option final statement in switch block.</p>
+<p>Register the default case: the action to run when no other case matches.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L29-L43" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L37-L55" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>default(func)</span></code></pre></div>
 </div>
 <div class="doc-text">
+<p>Use it as the optional final statement in the switch block. Note that the ordering is not enforced: if <a href="switch.html#switchlang.switch.default" class="gdls-link gdls-code">default()</a> is registered before a case that also matches, both will run. Always register it last.</p>
 <pre><code>    with switch(val) as s:
        s.case(...)
        s.case(...)
@@ -545,9 +570,9 @@ True if this case matched the switch value, otherwise None.
 <h5 class="doc-parameters anchored" data-anchor-id="parameters-2">Parameters</h5>
 <div class="doc-definition-items">
 <dl>
-<dt><code><span class="doc-parameter-name">func</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">typing.Callable[[], typing.Any]</span></code></dt>
+<dt><code><span class="doc-parameter-name">func</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">Callable[[], Any]</span></code></dt>
 <dd>
-Any callable taking no parameters to be executed if this (default) case matches.
+Any callable taking no parameters, executed if no other case matched.
 </dd>
 </dl>
 </div>
@@ -556,7 +581,7 @@ Any callable taking no parameters to be executed if this (default) case matches.
 <h5 class="doc-returns anchored" data-anchor-id="returns-2">Returns</h5>
 <div class="doc-definition-items">
 <dl>
-<dt><code></code></dt>
+<dt><code> <span class="doc-parameter-annotation">None</span></code></dt>
 <dd>
 None
 </dd>

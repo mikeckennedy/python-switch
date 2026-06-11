@@ -35,8 +35,9 @@ lint.per-file-ignores = { }
 # Allow unused variables when underscore-prefixed.
 # dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
-# Assume Python 3.13.
-target-version = "py313"
+# Match requires-python in pyproject.toml (>=3.9) so future lint rules
+# never suggest syntax the package can't ship.
+target-version = "py39"
 
 #[tool.ruff.mccabe]
 ## Unlike Flake8, default to a complexity level of 10.

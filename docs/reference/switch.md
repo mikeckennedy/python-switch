@@ -1,7 +1,7 @@
 ## switch
 
 
-switch is a module-level implementation of the switch statement for Python.
+An explicit switch statement for Python, implemented as a context manager.
 
 
 Usage
@@ -11,6 +11,8 @@ switch()
 ```
 
 
+Use it in a `with` block: register cases with [case()](switch.md#switchlang.switch.case) and [default()](switch.md#switchlang.switch.default), then read the matched case's return value from [result](switch.md#switchlang.switch.result).
+
 See https://github.com/mikeckennedy/python-switch for full details. Copyright Michael Kennedy (https://mkennedy.codes) License: MIT
 
 
@@ -18,7 +20,7 @@ See https://github.com/mikeckennedy/python-switch for full details. Copyright Mi
 
 | Name | Description |
 |----|----|
-| [result](#result) | The value captured from the method called for a given case. |
+| [result](#result) | The value returned by the function of the matched case. |
 
 ------------------------------------------------------------------------
 
@@ -26,11 +28,13 @@ See https://github.com/mikeckennedy/python-switch for full details. Copyright Mi
 #### result
 
 
-The value captured from the method called for a given case.
+The value returned by the function of the matched case.
 
 
-`result`
+`result: Any`
 
+
+When cases fall through, [result](switch.md#switchlang.switch.result) is the return value of the last function executed.
 
         value = 4
         with switch(value) as s:
@@ -40,6 +44,13 @@ The value captured from the method called for a given case.
         res = s.result  # res == '1-to-5'
 
 
+##### Raises
+
+
+`Exception`  
+If accessed before the switch block has exited and computed a result.
+
+
 ## Methods
 
 | Name | Description |
@@ -47,8 +58,8 @@ The value captured from the method called for a given case.
 | [__enter__()](#__enter__) | Enter the switch block. |
 | [__exit__()](#__exit__) | Run the matched case (and any fall-through cases) as the block exits. |
 | [__init__()](#__init__) | Create a new switch block that tests cases against `value`. |
-| [case()](#case) | Specify a case for the switch block: |
-| [default()](#default) | Use as option final statement in switch block. |
+| [case()](#case) | Register a case for the switch block: |
+| [default()](#default) | Register the default case: the action to run when no other case matches. |
 
 ------------------------------------------------------------------------
 
@@ -69,6 +80,7 @@ __enter__()
 ##### Returns
 
 
+`switch`  
 The switch instance itself (bind it with `as s` to register cases).
 
 
@@ -114,7 +126,7 @@ __init__(value)
 ##### Parameters
 
 
-`value: typing.Any`  
+`value: Any`  
 The value each case key is compared against.
 
 
@@ -124,7 +136,7 @@ The value each case key is compared against.
 #### case()
 
 
-Specify a case for the switch block:
+Register a case for the switch block:
 
 
 Usage
@@ -143,20 +155,28 @@ case(key, func, fallthrough=False)
 ##### Parameters
 
 
-`key: typing.Any`  
-Key for the case test (if this is a list or range, the items will each be added as a case)
+`key: Any`  
+Key for the case test. If this is a list or range, each item is added as a case for `func`.
 
-`func: typing.Callable[[], typing.Any]`  
-Any callable taking no parameters to be executed if this case matches.
+`func: Callable[[], Any]`  
+Any callable taking no parameters, executed if this case matches.
 
-`fallthrough: typing.Optional[bool] = ``False`  
-Optionally fall through to the subsequent case (defaults to False)
+`fallthrough: bool | None = ``False`  
+Optionally fall through to the subsequent case (defaults to False). `None` is reserved for internal use and leaves the fall-through state unchanged.
 
 
 ##### Returns
 
 
-True if this case matched the switch value, otherwise None.
+`bool`  
+True if this case (or any item of a list or range key) matched the switch value, otherwise False.
+
+
+##### Raises
+
+
+`ValueError`  
+If the key is a duplicate, the key is an empty collection, or func is not callable.
 
 
 ------------------------------------------------------------------------
@@ -165,7 +185,7 @@ True if this case matched the switch value, otherwise None.
 #### default()
 
 
-Use as option final statement in switch block.
+Register the default case: the action to run when no other case matches.
 
 
 Usage
@@ -174,6 +194,8 @@ Usage
 default(func)
 ```
 
+
+Use it as the optional final statement in the switch block. Note that the ordering is not enforced: if [default()](switch.md#switchlang.switch.default) is registered before a case that also matches, both will run. Always register it last.
 
         with switch(val) as s:
            s.case(...)
@@ -184,11 +206,12 @@ default(func)
 ##### Parameters
 
 
-`func: typing.Callable[[], typing.Any]`  
-Any callable taking no parameters to be executed if this (default) case matches.
+`func: Callable[[], Any]`  
+Any callable taking no parameters, executed if no other case matched.
 
 
 ##### Returns
 
 
+`None`  
 None

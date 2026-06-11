@@ -8,7 +8,7 @@ The context manager that gives Python an explicit switch statement. Use it in a 
 
 
 [switch](switch.md#switchlang.switch)  
-switch is a module-level implementation of the switch statement for Python.
+An explicit switch statement for Python, implemented as a context manager.
 
 
 ## Range helpers
@@ -18,4 +18,4 @@ Helpers for mapping ranges of values to a single case.
 
 
 [closed_range()](closed_range.md#switchlang.closed_range)  
-Creates a closed range that allows you to specify a case
+Create a closed range for a case: both `start` and `stop` are included.

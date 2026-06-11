@@ -1,34 +1,46 @@
-import typing
+from __future__ import annotations
+
 import uuid
+from collections.abc import Callable
+from types import TracebackType
+from typing import Any
 
 
 class switch:
     """
-    switch is a module-level implementation of the switch statement for Python.
+    An explicit switch statement for Python, implemented as a context manager.
+
+    Use it in a `with` block: register cases with `case()` and `default()`,
+    then read the matched case's return value from `result`.
+
     See https://github.com/mikeckennedy/python-switch for full details.
     Copyright Michael Kennedy (https://mkennedy.codes)
     License: MIT
     """
 
-    __no_result: typing.Any = uuid.uuid4()
-    __default: typing.Any = uuid.uuid4()
+    __no_result: Any = uuid.uuid4()
+    __default: Any = uuid.uuid4()
 
-    def __init__(self, value: typing.Any):
+    def __init__(self, value: Any) -> None:
         """
         Create a new switch block that tests cases against `value`.
 
         :param value: The value each case key is compared against.
         """
         self.value = value
-        self.cases: typing.Set[typing.Any] = set()
+        self.cases: set[Any] = set()
         self._found = False
         self.__result = switch.__no_result
         self._falling_through = False
-        self._func_stack: typing.List[typing.Callable[[], typing.Any]] = []
+        self._func_stack: list[Callable[[], Any]] = []
 
-    def default(self, func: typing.Callable[[], typing.Any]):
+    def default(self, func: Callable[[], Any]) -> None:
         """
-        Use as option final statement in switch block.
+        Register the default case: the action to run when no other case matches.
+
+        Use it as the optional final statement in the switch block. Note that
+        the ordering is not enforced: if `default()` is registered before a case
+        that also matches, both will run. Always register it last.
 
         ```
             with switch(val) as s:
@@ -37,19 +49,19 @@ class switch:
                s.default(function)
         ```
 
-        :param func: Any callable taking no parameters to be executed if this (default) case matches.
+        :param func: Any callable taking no parameters, executed if no other case matched.
         :return: None
         """
         self.case(switch.__default, func)
 
     def case(
         self,
-        key: typing.Any,
-        func: typing.Callable[[], typing.Any],
-        fallthrough: typing.Optional[bool] = False,
-    ):
+        key: Any,
+        func: Callable[[], Any],
+        fallthrough: bool | None = False,
+    ) -> bool:
         """
-        Specify a case for the switch block:
+        Register a case for the switch block:
 
         ```
             with switch(val) as s:
@@ -58,10 +70,12 @@ class switch:
                s.default(function)
         ```
 
-        :param key: Key for the case test (if this is a list or range, the items will each be added as a case)
-        :param func: Any callable taking no parameters to be executed if this case matches.
-        :param fallthrough: Optionally fall through to the subsequent case (defaults to False)
-        :return: True if this case matched the switch value, otherwise None.
+        :param key: Key for the case test. If this is a list or range, each item is added as a case for `func`.
+        :param func: Any callable taking no parameters, executed if this case matches.
+        :param fallthrough: Optionally fall through to the subsequent case (defaults to False).
+                            `None` is reserved for internal use and leaves the fall-through state unchanged.
+        :return: True if this case (or any item of a list or range key) matched the switch value, otherwise False.
+        :raises ValueError: If the key is a duplicate, the key is an empty collection, or func is not callable.
         """
         if fallthrough is not None:
             if self._falling_through:
@@ -87,7 +101,7 @@ class switch:
 
         if key in self.cases:
             raise ValueError(f'Duplicate case: {key}')
-        if not func:
+        if func is None:
             raise ValueError('Action for case cannot be None.')
         if not callable(func):
             raise ValueError('Func must be callable.')
@@ -100,7 +114,9 @@ class switch:
                 self._falling_through = fallthrough
             return True
 
-    def __enter__(self):
+        return False
+
+    def __enter__(self) -> switch:
         """
         Enter the switch block.
 
@@ -108,7 +124,12 @@ class switch:
         """
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
+    ) -> None:
         """
         Run the matched case (and any fall-through cases) as the block exits.
 
@@ -118,16 +139,19 @@ class switch:
             raise exc_val
 
         if not self._func_stack:
-            raise Exception('Value does not match any case and there is no default case: value {}'.format(self.value))
+            raise Exception(f'Value does not match any case and there is no default case: value {self.value}')
 
         for func in self._func_stack:
             # noinspection PyCallingNonCallable
             self.__result = func()
 
     @property
-    def result(self):
+    def result(self) -> Any:
         """
-        The value captured from the method called for a given case.
+        The value returned by the function of the matched case.
+
+        When cases fall through, `result` is the return value of the last
+        function executed.
 
         ```
             value = 4
@@ -138,7 +162,8 @@ class switch:
             res = s.result  # res == '1-to-5'
         ```
 
-        :return: The value captured from the method called for a given case.
+        :return: The value returned by the matched case's function (the last one executed when falling through).
+        :raises Exception: If accessed before the switch block has exited and computed a result.
         """
         if self.__result == switch.__no_result:
             raise Exception('No result has been computed (did you access switch.result inside the with block?)')
@@ -146,22 +171,25 @@ class switch:
         return self.__result
 
 
-def closed_range(start: int, stop: int, step=1) -> range:
+def closed_range(start: int, stop: int, step: int = 1) -> range:
     """
-    Creates a closed range that allows you to specify a case
-    from [start, stop] inclusively.
+    Create a closed range for a case: both `start` and `stop` are included.
+
+    With the default step of 1, `closed_range(1, 5)` covers 1, 2, 3, 4, 5 —
+    unlike `range(1, 5)`, the upper bound is part of the range.
 
     ```
         with switch(value) as s:
             s.case(closed_range(1, 5), lambda: "1-to-5")
-            s.case(closed_range(6, 7), lambda: "6")
+            s.case(closed_range(6, 7), lambda: "6-or-7")
             s.default(lambda: 'default')
     ```
 
-    :param start: The inclusive lower bound of the range [start, stop].
-    :param stop: The inclusive upper bound of the range [start, stop].
+    :param start: The inclusive lower bound of the range.
+    :param stop: The inclusive upper bound of the range.
     :param step: The step size between elements (defaults to 1).
-    :return: A range() generator that has a closed upper bound.
+    :return: A range object with a closed (inclusive) upper bound.
+    :raises ValueError: If start is not less than stop.
     """
     if start >= stop:
         raise ValueError('Start must be less than stop.')

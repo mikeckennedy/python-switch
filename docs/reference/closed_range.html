@@ -110,7 +110,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../theme-init.js"></script>
 
 
-  <meta name="description" content="Creates a closed range that allows you to specify a case">
+  <meta name="description" content="Create a closed range for a case: both start and stop are included.">
   <script type="application/ld+json">
 [
   {
@@ -141,12 +141,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </script>
   <meta property="og:type" content="website">
   <meta property="og:title" content="closed_range() – switchlang | switchlang">
-  <meta property="og:description" content="Creates a closed range that allows you to specify a case">
+  <meta property="og:description" content="Create a closed range for a case: both start and stop are included.">
   <meta property="og:url" content="https://mkennedy.codes/docs/python-switch/reference/closed_range.html">
   <meta property="og:site_name" content="switchlang">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="closed_range() – switchlang | switchlang">
-  <meta name="twitter:description" content="Creates a closed range that allows you to specify a case">
+  <meta name="twitter:description" content="Create a closed range for a case: both start and stop are included.">
 </head>
 
 <body class="gd-ref-sidebar nav-sidebar floating nav-fixed doc-api-page quarto-light">
@@ -157,7 +157,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../index.html">
-    <span class="navbar-title">switchlang</span>
+    <span class="navbar-title">switchlang <span class="version-badge" title="Released 2025-09-11">v0.1.1</span></span>
     </a>
   </div>
             <div id="quarto-search" class=""></div>
@@ -250,6 +250,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#raises" id="toc-raises" class="nav-link" data-scroll-target="#raises">Raises</a></li>
   </ul>
 </nav>
     </div>
@@ -276,11 +277,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <div class="doc-subject">
-<p>Creates a closed range that allows you to specify a case</p>
+<p>Create a closed range for a case: both <code>start</code> and <code>stop</code> are included.</p>
 </div>
 <div class="doc-usage-source">
 <p>Usage</p>
-<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L149-L169" target="_blank" rel="noopener">Source</a></p>
+<p><a href="https://github.com/mikeckennedy/python-switch/blob/master/switchlang/__switchlang_impl.py#L174-L197" target="_blank" rel="noopener">Source</a></p>
 </div>
 <div class="doc-signature doc-Kind.FUNCTION">
 <div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="sig-name">closed_range</span>(
@@ -290,10 +291,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 )</span></code></pre></div>
 </div>
 <div class="doc-text">
-<p>from [start, stop] inclusively.</p>
+<p>With the default step of 1, <code>closed_range(1, 5)</code> covers 1, 2, 3, 4, 5 — unlike <code>range(1, 5)</code>, the upper bound is part of the range.</p>
 <pre><code>    with switch(value) as s:
         s.case(closed_range(1, 5), lambda: "1-to-5")
-        s.case(closed_range(6, 7), lambda: "6")
+        s.case(closed_range(6, 7), lambda: "6-or-7")
         s.default(lambda: 'default')</code></pre>
 </div>
 <section id="parameters" class="level2 doc-parameters">
@@ -302,13 +303,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <dl>
 <dt><code><span class="doc-parameter-name">start</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span></code></dt>
 <dd>
-<p>The inclusive lower bound of the range [start, stop].</p>
+<p>The inclusive lower bound of the range.</p>
 </dd>
 <dt><code><span class="doc-parameter-name">stop</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span></code></dt>
 <dd>
-<p>The inclusive upper bound of the range [start, stop].</p>
+<p>The inclusive upper bound of the range.</p>
 </dd>
-<dt><code><span class="doc-parameter-name">step</span><span class="doc-parameter-default-sep op">=</span><span class="doc-parameter-default"><span class="dv">1</span></span></code></dt>
+<dt><code><span class="doc-parameter-name">step</span><span class="doc-parameter-annotation-sep">:</span> <span class="doc-parameter-annotation">int</span> <span class="doc-parameter-default-sep op">=</span> <span class="doc-parameter-default"><span class="dv">1</span></span></code></dt>
 <dd>
 The step size between elements (defaults to 1).
 </dd>
@@ -321,7 +322,18 @@ The step size between elements (defaults to 1).
 <dl>
 <dt><code> <span class="doc-parameter-annotation">range</span></code></dt>
 <dd>
-A range() generator that has a closed upper bound.
+A range object with a closed (inclusive) upper bound.
+</dd>
+</dl>
+</div>
+</section>
+<section id="raises" class="level2 doc-raises">
+<h2 class="doc-raises">Raises</h2>
+<div class="doc-definition-items">
+<dl>
+<dt><code> <span class="doc-parameter-annotation">ValueError</span></code></dt>
+<dd>
+If start is not less than stop.
 </dd>
 </dl>
 </div>

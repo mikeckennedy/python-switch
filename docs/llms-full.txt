@@ -9,9 +9,13 @@ The context manager that gives Python an explicit switch statement. Use it in a 
 
 
 
-switch(value: Any)
+switch(value: 'Any') -> 'None'
 
-switch is a module-level implementation of the switch statement for Python.
+An explicit switch statement for Python, implemented as a context manager.
+
+Use it in a `with` block: register cases with `case()` and `default()`,
+then read the matched case's return value from `result`.
+
 See https://github.com/mikeckennedy/python-switch for full details.
 Copyright Michael Kennedy (https://mkennedy.codes)
 License: MIT
@@ -23,19 +27,22 @@ Helpers for mapping ranges of values to a single case.
 
 
 
-closed_range(start: int, stop: int, step=1) -> range
+closed_range(start: 'int', stop: 'int', step: 'int' = 1) -> 'range'
 
-Creates a closed range that allows you to specify a case
-from [start, stop] inclusively.
+Create a closed range for a case: both `start` and `stop` are included.
+
+With the default step of 1, `closed_range(1, 5)` covers 1, 2, 3, 4, 5 —
+unlike `range(1, 5)`, the upper bound is part of the range.
 
 ```
     with switch(value) as s:
         s.case(closed_range(1, 5), lambda: "1-to-5")
-        s.case(closed_range(6, 7), lambda: "6")
+        s.case(closed_range(6, 7), lambda: "6-or-7")
         s.default(lambda: 'default')
 ```
 
-:param start: The inclusive lower bound of the range [start, stop].
-:param stop: The inclusive upper bound of the range [start, stop].
+:param start: The inclusive lower bound of the range.
+:param stop: The inclusive upper bound of the range.
 :param step: The step size between elements (defaults to 1).
-:return: A range() generator that has a closed upper bound.
+:return: A range object with a closed (inclusive) upper bound.
+:raises ValueError: If start is not less than stop.

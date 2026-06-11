@@ -2,7 +2,7 @@
 switchlang - Adds switch blocks to Python
 
 See https://github.com/mikeckennedy/python-switch for full details.
-Copyright Michael Kennedy (https://twitter.com/mkennedy)
+Copyright Michael Kennedy (https://mkennedy.codes)
 License: MIT
 """
 
@@ -15,5 +15,4 @@ except PackageNotFoundError:  # pragma: no cover
 __author__ = 'Michael Kennedy <michael@talkpython.fm>'
 __all__ = ['switch', 'closed_range']
 
-from .__switchlang_impl import switch # noqa
-from .__switchlang_impl import closed_range # noqa
+from .__switchlang_impl import closed_range, switch  # noqa: E402
