@@ -1,4 +1,4 @@
-# Reference
+# API Reference
 
 
 ## The switch block

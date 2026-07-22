@@ -4,3 +4,7 @@ User-agent: *
 Allow: /
 
 Sitemap: https://mkennedy.codes/docs/python-switch/sitemap.xml
+
+# AI agent context files
+Llms-txt: https://mkennedy.codes/docs/python-switch/llms.txt
+Llms-txt: https://mkennedy.codes/docs/python-switch/llms-full.txt

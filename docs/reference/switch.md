@@ -7,7 +7,7 @@ An explicit switch statement for Python, implemented as a context manager.
 Usage
 
 ``` python
-switch()
+switch(value)
 ```
 
 

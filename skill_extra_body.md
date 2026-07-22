@@ -1,66 +1,3 @@
----
-name: switchlang
-description: >
-  Adds switch blocks to the Python language. Use when writing Python code that uses the switchlang package.
-license: MIT
-compatibility: Requires Python >=3.9.
----
-
-# switchlang
-
-Adds switch blocks to the Python language.
-
-## Installation
-
-```bash
-pip install switchlang
-```
-
-## When to use what
-
-| Need | Use |
-|------|-----|
-| Map several discrete values to one action | `s.case(['c', 'a'], func) — list keys expand to one case per item` |
-| Match an inclusive numeric span | `s.case(closed_range(1, 5), func)` |
-| Run the next case too (fall-through) | `s.case(key, func, fallthrough=True)` |
-| Get the matched case's return value | `s.result, after the with block exits` |
-| Handle 'nothing matched' | `s.default(func), registered last` |
-| Match a key but do nothing | `s.case(key, lambda: None)` |
-
-## API overview
-
-### The switch block
-
-The context manager that gives Python an explicit switch statement. Use it in a `with` block, register cases, then read `result`.
-
-
-- `switch`: An explicit switch statement for Python, implemented as a context manager
-
-### Range helpers
-
-Helpers for mapping ranges of values to a single case.
-
-
-- `closed_range`: Create a closed range for a case: both `start` and `stop` are included
-
-## Gotchas
-
-1. Cases execute on block exit, not at registration: case()/default() only register; the matched function runs in __exit__, and s.result is only readable after the with block (reading it inside raises).
-2. Case functions take no parameters — bind arguments with a lambda: s.case('b', lambda: process(val)). Passing process(val) calls it immediately and registers its return value.
-3. default() ordering is not enforced: a default registered before a matching case runs as well. Always register default() last.
-4. Adjacent closed_range cases overlap (closed_range(1, 5) and closed_range(5, 9) both contain 5) and raise a duplicate-case ValueError — follow closed_range(1, 5) with closed_range(6, 9).
-5. Keys are matched with == and stored in a set: they must be hashable, and equal-comparing keys (1 and True, 1 and 1.0) are duplicates.
-6. If no case matches and no default() is registered, the block raises Exception on exit.
-7. An exception raised inside the with block aborts the switch — it is re-raised and no case actions run.
-8. fallthrough=None is reserved for internal use — pass only True or False.
-
-## Best practices
-
-- Register default() as the last statement in every switch block.
-- Read s.result only after the with block exits; capture per-case data via lambdas or closures.
-- Use closed_range(start, stop) for inclusive numeric spans and plain range() for half-open ones.
-- Import from the package — from switchlang import switch, closed_range — never from the private __switchlang_impl module.
-
 ## End-to-end wiring
 
 A complete, minimal switch — registration inside the `with` block, execution at block exit, result read after:
@@ -116,11 +53,3 @@ Matching is plain `key == value`, and keys are stored in a `set`, so every key m
 ## Fetching the docs as Markdown
 
 Every page on the documentation site has a plain-Markdown twin: swap the `.html` extension for `.md` to get token-efficient source without the site chrome. For example https://mkennedy.codes/docs/python-switch/reference/switch.html is also available at https://mkennedy.codes/docs/python-switch/reference/switch.md. Prefer the `.md` form when reading these docs programmatically.
-
-
-## Resources
-
-- [Full documentation](https://mkennedy.codes/docs/python-switch/)
-- [llms.txt](llms.txt) — Indexed API reference for LLMs
-- [llms-full.txt](llms-full.txt) — Comprehensive documentation for LLMs
-- [Source code](https://github.com/mikeckennedy/python-switch)

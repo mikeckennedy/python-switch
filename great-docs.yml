@@ -60,6 +60,40 @@ sections:
     dir: changelog
     navbar_after: Reference
 
+skill:
+  # Hand-written prose injected into the generated skill body — the execution
+  # model (cases run on block exit), lambda argument binding, fall-through
+  # mechanics, and key semantics — things the API signatures can't convey.
+  # Adapted from the python-switch_reference.md agent guide.
+  extra_body: skill_extra_body.md
+  gotchas:
+    - "Cases execute on block exit, not at registration: case()/default() only register; the matched function runs in __exit__, and s.result is only readable after the with block (reading it inside raises)."
+    - "Case functions take no parameters — bind arguments with a lambda: s.case('b', lambda: process(val)). Passing process(val) calls it immediately and registers its return value."
+    - "default() ordering is not enforced: a default registered before a matching case runs as well. Always register default() last."
+    - "Adjacent closed_range cases overlap (closed_range(1, 5) and closed_range(5, 9) both contain 5) and raise a duplicate-case ValueError — follow closed_range(1, 5) with closed_range(6, 9)."
+    - "Keys are matched with == and stored in a set: they must be hashable, and equal-comparing keys (1 and True, 1 and 1.0) are duplicates."
+    - "If no case matches and no default() is registered, the block raises Exception on exit."
+    - "An exception raised inside the with block aborts the switch — it is re-raised and no case actions run."
+    - "fallthrough=None is reserved for internal use — pass only True or False."
+  best_practices:
+    - "Register default() as the last statement in every switch block."
+    - "Read s.result only after the with block exits; capture per-case data via lambdas or closures."
+    - "Use closed_range(start, stop) for inclusive numeric spans and plain range() for half-open ones."
+    - "Import from the package — from switchlang import switch, closed_range — never from the private __switchlang_impl module."
+  decision_table:
+    - need: "Map several discrete values to one action"
+      use: "s.case(['c', 'a'], func) — list keys expand to one case per item"
+    - need: "Match an inclusive numeric span"
+      use: "s.case(closed_range(1, 5), func)"
+    - need: "Run the next case too (fall-through)"
+      use: "s.case(key, func, fallthrough=True)"
+    - need: "Get the matched case's return value"
+      use: "s.result, after the with block exits"
+    - need: "Handle 'nothing matched'"
+      use: "s.default(func), registered last"
+    - need: "Match a key but do nothing"
+      use: "s.case(key, lambda: None)"
+
 # Author metadata for display in the landing page sidebar
 authors:
   - name: Michael Kennedy
