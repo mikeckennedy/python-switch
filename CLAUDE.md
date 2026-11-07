@@ -24,11 +24,12 @@ from `s.result`. The whole library is ~200 lines with **zero runtime dependencie
 | [switchlang/__init__.py](switchlang/__init__.py) | Public package: re-exports `switch` and `closed_range`, sets `__version__`/`__author__`/`__all__`. |
 | [switchlang/__switchlang_impl.py](switchlang/__switchlang_impl.py) | **The entire implementation** — `switch` class and `closed_range()`. Make code changes here. |
 | [switchlang/py.typed](switchlang/py.typed) | PEP 561 marker so type checkers read our hints. |
-| [tests/test_core.py](tests/test_core.py) | The whole test suite (29 `unittest`-style tests). |
+| [tests/test_core.py](tests/test_core.py) | The whole test suite (30 `unittest`-style tests). |
 | [pyproject.toml](pyproject.toml) | Packaging (hatchling), metadata, version, `[dev]` extra. |
 | [ruff.toml](ruff.toml) | Lint + format config. |
 | [great-docs.yml](great-docs.yml) | Docs site config (Great Docs / Quarto). |
 | [scripts/build_docs.py](scripts/build_docs.py) | Builds docs and mirrors them into `docs/`. |
+| [scripts/postprocess_site.py](scripts/postprocess_site.py) | Post-build fix-ups on `docs/`: rewrites the navbar version badge from `pyproject.toml` + `CHANGELOG.md`. |
 | [scripts/serve_docs.py](scripts/serve_docs.py) | Local preview that mimics the nginx subpath. |
 | [docs/](docs/) | **Generated** static site (committed, served at `mkennedy.codes/docs/python-switch`). Do not hand-edit. |
 | [README.md](README.md) | The narrative/marketing docs and rationale. Keep in sync with behavior. |
@@ -45,13 +46,13 @@ Only two names are public (`switchlang.__all__`): **`switch`** and **`closed_ran
 from switchlang import switch, closed_range
 
 with switch(value) as s:
-    s.case('a', process_a)                       # key == value -> run process_a
-    s.case(['v', 'b'], view_bookings)            # list key: each item is a case
-    s.case(range(1, 6), handler)                 # range key: each item is a case
-    s.case(closed_range(1, 5), handler)          # inclusive range: 1,2,3,4,5
-    s.case(2, do_two, fallthrough=True)          # opt into running the next case too
-    s.default(unknown_command)                   # runs if nothing else matched
-print(s.result)                                  # return value of the executed case
+    s.case('a', process_a)  # key == value -> run process_a
+    s.case(['v', 'b'], view_bookings)  # list key: each item is a case
+    s.case(range(1, 6), handler)  # range key: each item is a case
+    s.case(closed_range(1, 5), handler)  # inclusive range: 1,2,3,4,5
+    s.case(2, do_two, fallthrough=True)  # opt into running the next case too
+    s.default(unknown_command)  # runs if nothing else matched
+print(s.result)  # return value of the executed case
 ```
 
 Behaviors that are easy to get wrong — preserve all of these (they are pinned by tests):
@@ -164,9 +165,11 @@ Coding constraints — match the existing style:
 - To cut a release: bump `[project].version`, rename `## [Unreleased]` in
   `CHANGELOG.md` to `## [X.Y.Z] - <date>` (add a fresh empty `[Unreleased]` and a
   new compare-link line in the footer), reinstall, then rebuild docs. The docs
-  **version badge** comes from PyPI (`pypi: true`), so it shows the latest
-  *published* release and only updates to the new version after you publish to PyPI
-  and rebuild — it legitimately lags during a release.
+  **version badge** is rewritten by `scripts/postprocess_site.py` from
+  `[project].version` plus the matching dated `## [X.Y.Z] - YYYY-MM-DD` heading in
+  `CHANGELOG.md`, so date the changelog heading *before* building. (Great Docs itself
+  sources the badge from the latest **GitHub Release**, not PyPI, which is why an
+  un-patched build shows the previous version until you release and rebuild.)
 - Build backend is **hatchling**; the wheel packages the `switchlang/` directory.
 - The changelog is **hand-maintained** in the repo-root [CHANGELOG.md](CHANGELOG.md)
   ([Keep a Changelog](https://keepachangelog.com/) format). Record every
@@ -183,8 +186,11 @@ installed package, so the docstrings in `__switchlang_impl.py` are the real sour
 of the API reference. The flow:
 
 1. `scripts/build_docs.py` runs `great-docs build` (output -> `great-docs/_site`,
-   which is ephemeral/gitignored) and **mirrors it into the committed `docs/`
-   folder** (full replace, so deleted pages don't linger).
+   which is ephemeral/gitignored), **mirrors it into the committed `docs/`
+   folder** (full replace, so deleted pages don't linger), then runs the
+   `scripts/postprocess_site.py` fix-ups on `docs/` (version badge; see above). It
+   prints the badge replacement count — **0 after a Great Docs upgrade means the badge
+   markup changed** and the regex in `postprocess_site.py` needs updating.
 2. `scripts/serve_docs.py` serves `docs/` locally on port **8099** under the
    `/docs/python-switch` subpath to mirror production nginx and catch
    absolute-path asset bugs.

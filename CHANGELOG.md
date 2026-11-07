@@ -97,7 +97,7 @@ two correctness bugs in the public API
   an initial round of type annotations, including a fix for a potential type
   warning on `s.result`.
 
-## [0.1.0] - 2020-12-10
+## [0.1.0] - 2020-03-20
 
 ### Added
 
@@ -109,5 +109,5 @@ two correctness bugs in the public API
 [Unreleased]: https://github.com/mikeckennedy/python-switch/compare/v0.1.3...HEAD
 [0.1.3]: https://github.com/mikeckennedy/python-switch/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/mikeckennedy/python-switch/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/mikeckennedy/python-switch/releases/tag/v0.1.1
-[0.1.0]: https://pypi.org/project/switchlang/0.1.0/
+[0.1.1]: https://github.com/mikeckennedy/python-switch/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/mikeckennedy/python-switch/releases/tag/v0.1.0

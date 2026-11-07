@@ -48,7 +48,7 @@ This release brings switchlang's whole public-facing surface up to date -- a doc
 - **Docstrings rewritten to render as the API reference:** [switch](../reference/switch.md#switchlang.switch) is described as a context manager; [default()](../reference/switch.md#switchlang.switch.default) documents that ordering is not enforced (register it last); [case()](../reference/switch.md#switchlang.switch.case) documents its return contract, the `ValueError`s it raises, and the internal no-match sentinel; [result](../reference/switch.md#switchlang.switch.result) documents that the last function executed wins under fall-through; and [closed_range](../reference/closed_range.md#switchlang.closed_range) is documented as returning a `range` object (not a "generator") with its step semantics and `ValueError`. ([\#13](https://github.com/mikeckennedy/python-switch/issues/13))
 
 
-# [0.1.1](https://github.com/mikeckennedy/python-switch/releases/tag/v0.1.1) - 2025-09-11
+# [0.1.1](https://github.com/mikeckennedy/python-switch/compare/v0.1.0...v0.1.1) - 2025-09-11
 
 
 ## Changed
@@ -56,7 +56,7 @@ This release brings switchlang's whole public-facing surface up to date -- a doc
 - Standardized string literals on double quotes across the codebase and added an initial round of type annotations, including a fix for a potential type warning on `s.result`.
 
 
-# [0.1.0](https://pypi.org/project/switchlang/0.1.0/) - 2020-12-10
+# [0.1.0](https://github.com/mikeckennedy/python-switch/releases/tag/v0.1.0) - 2020-03-20
 
 
 ## Added

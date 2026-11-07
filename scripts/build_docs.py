@@ -13,6 +13,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from postprocess_site import rewrite_version_badges, version_badge
+
 REPO_ROOT = Path(__file__).resolve().parent.parent  # pyproject.toml + great-docs.yml live here
 SITE = REPO_ROOT / 'great-docs' / '_site'
 DEST = REPO_ROOT / 'docs'
@@ -48,9 +50,11 @@ def stage_changelog() -> None:
 def main() -> int:
     stage_changelog()
 
-    # Prefer the great-docs entry point that lives next to this interpreter (the venv's).
-    great_docs = Path(sys.executable).with_name('great-docs')
-    cmd = [str(great_docs) if great_docs.exists() else 'great-docs', 'build']
+    # Always build with the *latest* Great Docs release, not whatever the project venv
+    # happens to pin: a stale copy silently drops/changes generated files under docs/.
+    # `--with-editable` installs switchlang alongside it so `dynamic: true` introspection
+    # works (same command as the maintainer's `great_docs_build` shell alias).
+    cmd = ['uvx', '--from', 'great-docs@latest', '--with-editable', str(REPO_ROOT), 'great-docs', 'build']
     if subprocess.run(cmd, cwd=REPO_ROOT).returncode != 0:
         return 1
 
@@ -65,6 +69,15 @@ def main() -> int:
 
     file_count = sum(1 for p in DEST.rglob('*') if p.is_file())
     print(f'Mirrored -> {DEST} ({file_count} files)')
+
+    # Great Docs derives the navbar version badge from the latest GitHub Release, which
+    # doesn't exist yet when we build for a new version. Rewrite it from pyproject.toml
+    # + CHANGELOG.md (see postprocess_site.py for the full story).
+    badge = version_badge()
+    count = rewrite_version_badges(DEST, badge)
+    print(f'Rewrote {count} version badge(s) -> {badge}')
+    if count == 0:
+        print('WARNING: no version badges found in the built site (badge markup changed?)', file=sys.stderr)
     return 0
 
 

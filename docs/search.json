@@ -22,14 +22,14 @@
     "href": "package-info.html",
     "title": "Package Info",
     "section": "",
-    "text": "Package\nVersion Constraint\nEnvironment Marker\nLast Published\nPyPI\n\n\n\n\npytest\n—\n\n2026-06-19\n\n\n\ngreat-docs\n—\npython_version &gt;= \"3.11\"\n2026-07-10"
+    "text": "Package\nVersion Constraint\nEnvironment Marker\nLast Published\nPyPI\n\n\n\n\npytest\n—\n\n2026-10-27\n\n\n\ngreat-docs\n&gt;=0.17.0\npython_version &gt;= \"3.11\"\n2026-08-13"
   },
   {
     "objectID": "package-info.html#dev",
     "href": "package-info.html#dev",
     "title": "Package Info",
     "section": "",
-    "text": "Package\nVersion Constraint\nEnvironment Marker\nLast Published\nPyPI\n\n\n\n\npytest\n—\n\n2026-06-19\n\n\n\ngreat-docs\n—\npython_version &gt;= \"3.11\"\n2026-07-10"
+    "text": "Package\nVersion Constraint\nEnvironment Marker\nLast Published\nPyPI\n\n\n\n\npytest\n—\n\n2026-10-27\n\n\n\ngreat-docs\n&gt;=0.17.0\npython_version &gt;= \"3.11\"\n2026-08-13"
   },
   {
     "objectID": "index.html",
@@ -173,7 +173,7 @@
     "crumbs": [
       "Reference",
       "Range helpers",
-      "[closed_range()]{.doc-object-name .doc-function .doc-label .doc-label-function}"
+      "closed_range"
     ]
   },
   {
@@ -185,7 +185,7 @@
     "crumbs": [
       "Reference",
       "The switch block",
-      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+      "switch"
     ]
   },
   {
@@ -197,7 +197,7 @@
     "crumbs": [
       "Reference",
       "The switch block",
-      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+      "switch"
     ]
   },
   {
@@ -209,7 +209,7 @@
     "crumbs": [
       "Reference",
       "The switch block",
-      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+      "switch"
     ]
   },
   {
@@ -221,7 +221,7 @@
     "crumbs": [
       "Reference",
       "The switch block",
-      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+      "switch"
     ]
   },
   {
@@ -233,7 +233,7 @@
     "crumbs": [
       "Reference",
       "The switch block",
-      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+      "switch"
     ]
   },
   {
@@ -245,7 +245,7 @@
     "crumbs": [
       "Reference",
       "The switch block",
-      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+      "switch"
     ]
   },
   {
@@ -257,7 +257,7 @@
     "crumbs": [
       "Reference",
       "The switch block",
-      "[switch]{.doc-object-name .doc-class .doc-label .doc-label-class}"
+      "switch"
     ]
   }
 ]

@@ -48,7 +48,7 @@ Funding = "https://github.com/sponsors/mikeckennedy"
 [project.optional-dependencies]
 dev = [
     "pytest",
-    "great-docs; python_version >= '3.11'",
+    "great-docs>=0.17.0; python_version >= '3.11'",
 ]
 
 [tool.hatch.build.targets.wheel]
