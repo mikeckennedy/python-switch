@@ -17,3 +17,27 @@
 
 
 - [closed_range](https://mkennedy.codes/docs/python-switch/reference/closed_range.html): Create a closed range for a case: both `start` and `stop` are included
+
+### User Guide
+
+#### Get started
+
+- [Getting started](https://mkennedy.codes/docs/python-switch/user-guide/getting-started.html)
+- [How a switch block runs](https://mkennedy.codes/docs/python-switch/user-guide/how-it-works.html)
+
+#### Cases
+
+- [Keys and matching](https://mkennedy.codes/docs/python-switch/user-guide/keys-and-matching.html)
+- [Fall-through](https://mkennedy.codes/docs/python-switch/user-guide/fall-through.html)
+- [Results](https://mkennedy.codes/docs/python-switch/user-guide/results.html)
+- [Errors and validation](https://mkennedy.codes/docs/python-switch/user-guide/errors.html)
+
+#### Go further
+
+- [Patterns](https://mkennedy.codes/docs/python-switch/user-guide/patterns.html)
+- [switch, dict, if/elif or match?](https://mkennedy.codes/docs/python-switch/user-guide/alternatives.html)
+
+### Agent Skill and Full Context
+
+- [Agent Skill (SKILL.md)](https://mkennedy.codes/docs/python-switch/skill.md): compact guide, decision table and gotchas for AI agents
+- [Full Documentation (llms-full.txt)](https://mkennedy.codes/docs/python-switch/llms-full.txt): API reference and User Guide in one file

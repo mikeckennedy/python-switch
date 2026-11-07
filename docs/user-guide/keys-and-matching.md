@@ -1,0 +1,202 @@
+# Keys and matching
+
+A case key is any value you want to compare the switch value against. This page covers how that comparison works, what makes a valid key, and the three ways to map several keys to one action: lists, ranges and [closed_range](../reference/closed_range.md#switchlang.closed_range).
+
+
+# Equality, not identity
+
+A case matches when `key == value`. That is the same rule a dict lookup uses, with the same consequences: `1`, `1.0` and `True` are all the same key.
+
+
+``` python
+from switchlang import switch
+
+with switch(1.0) as s:
+    s.case(1, lambda: 'matched the integer 1')
+    s.default(lambda: 'no match')
+
+print(s.result)
+```
+
+
+    matched the integer 1
+
+
+Registering two of them is a duplicate, and switchlang says so:
+
+
+``` python
+try:
+    with switch(1) as s:
+        s.case(1, lambda: 'one')
+        s.case(True, lambda: 'true')
+except ValueError as e:
+    print(e)
+```
+
+
+    Duplicate case: True
+
+
+# Keys must be hashable
+
+Keys are kept in a set so duplicates can be detected, so a key has to be hashable. Numbers, strings, `None`, enum members, tuples and most objects qualify. A dict or a list does not; a list is instead treated as a collection of keys (see below).
+
+
+``` python
+try:
+    with switch('x') as s:
+        s.case({'not': 'hashable'}, lambda: None)
+except TypeError as e:
+    print(e)
+```
+
+
+    cannot use 'dict' as a set element (unhashable type: 'dict')
+
+
+# Any hashable value works
+
+Enum members and `None` are good keys. A tuple is a single key, which makes it a natural way to switch on a pair of values:
+
+
+``` python
+from enum import Enum
+
+
+class Light(Enum):
+    RED = 1
+    GREEN = 2
+
+
+with switch(Light.GREEN) as s:
+    s.case(Light.RED, lambda: 'stop')
+    s.case(Light.GREEN, lambda: 'go')
+    s.case(None, lambda: 'light is off')
+
+print(s.result)
+
+with switch(('admin', 'delete')) as s:
+    s.case(('admin', 'delete'), lambda: 'allowed')
+    s.case(('user', 'delete'), lambda: 'denied')
+    s.default(lambda: 'unknown action')
+
+print(s.result)
+```
+
+
+    go
+    allowed
+
+
+[Patterns](patterns.md) builds a small state machine on tuple keys.
+
+
+# Lists: several keys, one action
+
+A list key registers one case per item, all pointing at the same function:
+
+
+``` python
+def kind(ch):
+    with switch(ch) as s:
+        s.case(list('aeiou'), lambda: 'vowel')
+        s.case(list('bcdfghjklmnpqrstvwxyz'), lambda: 'consonant')
+        s.default(lambda: 'not a lowercase letter')
+    return s.result
+
+
+print(kind('e'), kind('k'), kind('7'))
+```
+
+
+    vowel consonant not a lowercase letter
+
+
+Each item is a real case, so an item that already appears in another case is a duplicate error, and an empty list is refused because it could never match. The list itself is never a key; if you want to match a sequence as one value, use a tuple.
+
+
+# Ranges
+
+A `range` works the same way: every number in it becomes a case. Remember that `range` is half-open, so `range(1, 6)` is `1` through `5`:
+
+
+``` python
+with switch(5) as s:
+    s.case(range(1, 6), lambda: 'range(1, 6) covers 1 to 5')
+    s.case(range(6, 10), lambda: 'range(6, 10) covers 6 to 9')
+    s.default(lambda: 'out of range')
+
+print(s.result)
+```
+
+
+    range(1, 6) covers 1 to 5
+
+
+That `6` at the end of one case and the start of the next is correct, but you have to know the half-open rule to read it. For "levels one through five" it is easier to say what you mean.
+
+
+# [closed_range](../reference/closed_range.md#switchlang.closed_range): inclusive on both ends
+
+`closed_range(start, stop)` includes `stop`. With a `step`, it never goes past `stop`, and `stop` itself is included when the step lands on it:
+
+
+``` python
+from switchlang import closed_range
+
+print(list(closed_range(1, 5)))
+print(list(closed_range(1, 6, 2)))
+print(list(closed_range(1, 7, 2)))
+```
+
+
+    [1, 2, 3, 4, 5]
+    [1, 3, 5]
+    [1, 3, 5, 7]
+
+
+So the levels example reads the way you'd say it:
+
+
+``` python
+with switch(5) as s:
+    s.case(closed_range(1, 5), lambda: 'one to five')
+    s.case(closed_range(6, 9), lambda: 'six to nine')
+    s.default(lambda: 'out of range')
+
+print(s.result)
+```
+
+
+    one to five
+
+
+One thing to watch: adjacent closed ranges share their boundary. `closed_range(1, 5)` and `closed_range(5, 9)` both contain `5`, which is a duplicate:
+
+
+``` python
+try:
+    with switch(5) as s:
+        s.case(closed_range(1, 5), lambda: 'low')
+        s.case(closed_range(5, 9), lambda: 'high')
+except ValueError as e:
+    print(e)
+```
+
+
+    Duplicate case: 5
+
+
+Start the neighbor at `6`. [closed_range](../reference/closed_range.md#switchlang.closed_range) also insists that `start < stop` and `step >= 1`; [Errors and validation](errors.md) lists those checks.
+
+
+# A note on large ranges
+
+Because every number in a range becomes its own case, `s.case(range(1, 1_000_000), f)` registers a million keys. That works, but it is a million set insertions on every run of the block. For wide numeric bands, a few comparisons before the switch, or a [default()](../reference/switch.md#switchlang.switch.default) that does the arithmetic, is a better fit. switchlang is for dispatching on a readable set of values, not for interval arithmetic.
+
+
+# Next
+
+- [Fall-through](fall-through.md): make a matched case run the next one too.
+- [Results](results.md): what comes back, and when.

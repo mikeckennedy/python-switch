@@ -8,6 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 # [Unreleased](https://github.com/mikeckennedy/python-switch/compare/v0.1.3...HEAD)
 
 
+## Added
+
+- A **User Guide** on the docs site: Getting started, How a switch block runs, Keys and matching, Fall-through, Results, Errors and validation, Patterns, and a comparison with `dict` / `if-elif` / `match`. Every code example in the guide is executed when the site is built, so the output shown is the output you get.
+
+
+## Changed
+
+- The README is now a guided tour of the library rather than a feature list. Same behavior, told better; every claim is pinned by a test or an executed guide example.
+- Docs build: the navbar version badge is derived from `pyproject.toml` and the dated `CHANGELOG.md` heading instead of the latest GitHub Release, so a site built for a new version shows that version before the release exists.
+
+
 # [0.1.3](https://github.com/mikeckennedy/python-switch/compare/v0.1.2...v0.1.3) - 2026-06-11
 
 

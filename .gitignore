@@ -110,3 +110,6 @@ uv.lock
 # Great Docs "Changelog" section, staged from CHANGELOG.md by scripts/build_docs.py
 /changelog/
 .DS_Store
+
+# Quarto freeze cache (disabled in great-docs.yml, but never commit one)
+/_freeze/

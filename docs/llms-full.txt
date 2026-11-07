@@ -49,3 +49,996 @@ as in `closed_range(1, 7, 2)` -> 1, 3, 5, 7.
 :param step: The step size between elements; must be 1 or greater (defaults to 1).
 :return: A range object with a closed (inclusive) upper bound.
 :raises ValueError: If start is not less than stop, or step is less than 1.
+
+
+----------------------------------------------------------------------
+This is the User Guide documentation for the package.
+----------------------------------------------------------------------
+
+
+## Get started
+
+### Getting started
+
+This page installs switchlang, writes a first switch block, and explains the one idea you
+need in order to use it well: the cases run when the block *ends*, not when you write them.
+
+## Install
+
+```bash
+pip install switchlang
+# or
+uv add switchlang
+```
+
+switchlang supports Python 3.9 and newer. It is about 200 lines of code with no runtime
+dependencies, and it ships type hints (a `py.typed` marker), so your editor and type checker
+know what `s.case` and `s.result` are.
+
+## Your first switch
+
+```{python}
+from switchlang import switch
+
+
+def greet():
+    return 'Hello!'
+
+
+def farewell():
+    return 'Goodbye!'
+
+
+def shrug():
+    return 'Not sure what you meant.'
+
+
+command = 'hi'
+
+with switch(command) as s:
+    s.case('hi', greet)
+    s.case('bye', farewell)
+    s.default(shrug)
+
+print(s.result)
+```
+
+Reading top to bottom:
+
+- `switch(command)` opens the block and remembers the value to test.
+- Each `s.case(key, func)` *registers* a case. The key is compared to the value with `==`.
+  `func` is stored, not called.
+- `s.default(func)` registers what to run when nothing else matched. Make it the last line
+  of the block.
+- When the block ends, the matched function runs. Its return value is then available as
+  `s.result`.
+
+That last point is the whole design. A `with` statement has a well-defined end, and
+switchlang uses that moment to execute whatever matched. [How a switch block
+runs](how-it-works.qmd) goes through it step by step.
+
+## Pass arguments with a lambda
+
+Case functions take no arguments. When the action needs some, wrap the call in a lambda:
+
+```{python}
+def set_volume(level):
+    return f'volume set to {level}'
+
+
+level = 7
+
+with switch('v') as s:
+    s.case('v', lambda: set_volume(level))
+    s.case('m', lambda: set_volume(0))
+    s.default(lambda: 'unknown command')
+
+print(s.result)
+```
+
+Without the lambda, `s.case('v', set_volume(level))` would call `set_volume` immediately and
+hand its return value, a string, to `case()` as the action. switchlang refuses that at once
+rather than failing later:
+
+```{python}
+try:
+    with switch('v') as s:
+        s.case('v', set_volume(level))
+except ValueError as e:
+    print(e)
+```
+
+## Several keys, one action
+
+A list or a range as the key registers one case per item, all pointing at the same function.
+`closed_range` is a range that includes both ends:
+
+```{python}
+from switchlang import closed_range
+
+
+def grade(score):
+    with switch(score) as s:
+        s.case(closed_range(90, 100), lambda: 'A')
+        s.case(closed_range(80, 89), lambda: 'B')
+        s.case(closed_range(70, 79), lambda: 'C')
+        s.default(lambda: 'needs work')
+    return s.result
+
+
+print([grade(n) for n in (95, 83, 71, 40)])
+```
+
+Wrapping the block in a function that returns `s.result`, as `grade()` does, is the most
+common way to use switchlang. [Keys and matching](keys-and-matching.qmd) covers lists,
+ranges and what makes a valid key.
+
+## Next steps
+
+- [How a switch block runs](how-it-works.qmd): the execution model, and what happens when
+  something goes wrong inside the block.
+- [Fall-through](fall-through.qmd): run the next case too, on purpose.
+- [Results](results.qmd): everything about `s.result`.
+- [Errors and validation](errors.qmd): what switchlang refuses, and when.
+- [Patterns](patterns.qmd): command loops, dispatch tables built from data, state machines.
+- [switch, dict, if/elif or match?](alternatives.qmd): when to reach for which.
+
+
+### How a switch block runs
+
+switchlang adds no syntax to Python. `switch` is a class with `__enter__` and `__exit__`, so a
+switch block is an ordinary `with` statement. This page follows one from the `with` line to the
+line after it, because once the order of events is clear, every other behavior in this guide
+follows from it.
+
+## Register first, run at the end
+
+Here is a block that announces each step:
+
+```{python}
+from switchlang import switch
+
+
+def action():
+    print('  3. the matched action runs')
+    return 'done'
+
+
+print('1. before the block')
+
+with switch('a') as s:
+    print('  2. registering cases')
+    s.case('a', action)
+    s.case('b', lambda: 'never called')
+    print('  2. end of the block body')
+
+print('4. after the block, result =', s.result)
+```
+
+The action prints *after* the last line of the block body. Nothing about `s.case('a', action)`
+ran `action`; it only noted that `'a'` matched and queued the function. When the block closed,
+`__exit__` ran the queue.
+
+In detail:
+
+1. `switch(value)` creates the instance and stores `value`.
+2. `__enter__` returns the instance, which `as s` binds.
+3. Each `s.case(key, func)` checks `key` for duplicates, checks that `func` is callable,
+   compares `key == value`, and if they match appends `func` to an internal list. `default()`
+   is `case()` with a private sentinel as the key.
+4. `__exit__` calls every queued function in order and keeps the last return value. Then
+   `s.result` works.
+
+Because the functions run at step 4, anything they depend on must be ready by the end of the
+block, and anything you do inside the block (logging, say) happens before any action.
+
+## Why a `with` block?
+
+Python offers few ways to run code "at the end of this group of statements" without new
+syntax. Decorators wrap a function, not a block. A `with` statement is exactly that hook: a
+clear start, a clear end, and a body in between. It also gives the block a visual shape, a
+value at the top and an indented list of cases below, which is the shape a switch statement
+has in every language that has one.
+
+## `result` inside the block
+
+Reading `s.result` before the block ends raises, because nothing has run yet:
+
+```{python}
+try:
+    with switch('a') as s:
+        s.case('a', lambda: 'x')
+        print(s.result)
+except Exception as e:
+    print(type(e).__name__, '-', e)
+```
+
+If you need to act on the outcome, do it on the line after the block, or wrap the block in a
+function that returns `s.result`.
+
+## What `case()` returns
+
+`case()` returns `True` when its key (or any item of a list or range key) matched the value.
+You rarely need it, but it is there:
+
+```{python}
+with switch(3) as s:
+    hit = s.case(3, lambda: 'three')
+    miss = s.case(4, lambda: 'four')
+
+print(hit, miss)
+```
+
+## When the block raises
+
+If your own code raises inside the block, the exception propagates and the switch is
+abandoned. No queued action runs:
+
+```{python}
+ran = []
+
+try:
+    with switch('a') as s:
+        s.case('a', lambda: ran.append('a'))
+        raise RuntimeError('something went wrong while registering')
+except RuntimeError as e:
+    print('propagated:', e)
+
+print('actions that ran:', ran)
+```
+
+`__exit__` checks for an in-flight exception before it touches the queue. The check is
+`exc_val is not None`, an identity test, so even an exception object that is falsy (one with a
+`__bool__` or `__len__` returning false) aborts the switch. That detail was a real bug once
+([#15](https://github.com/mikeckennedy/python-switch/issues/15)), and the test suite pins it.
+
+## Next
+
+- [Keys and matching](keys-and-matching.qmd): what can be a key, and how lists and ranges
+  expand.
+- [Errors and validation](errors.qmd): which mistakes are caught at registration and which
+  at exit.
+
+
+
+## Cases
+
+### Keys and matching
+
+A case key is any value you want to compare the switch value against. This page covers how
+that comparison works, what makes a valid key, and the three ways to map several keys to one
+action: lists, ranges and `closed_range`.
+
+## Equality, not identity
+
+A case matches when `key == value`. That is the same rule a dict lookup uses, with the same
+consequences: `1`, `1.0` and `True` are all the same key.
+
+```{python}
+from switchlang import switch
+
+with switch(1.0) as s:
+    s.case(1, lambda: 'matched the integer 1')
+    s.default(lambda: 'no match')
+
+print(s.result)
+```
+
+Registering two of them is a duplicate, and switchlang says so:
+
+```{python}
+try:
+    with switch(1) as s:
+        s.case(1, lambda: 'one')
+        s.case(True, lambda: 'true')
+except ValueError as e:
+    print(e)
+```
+
+## Keys must be hashable
+
+Keys are kept in a set so duplicates can be detected, so a key has to be hashable. Numbers,
+strings, `None`, enum members, tuples and most objects qualify. A dict or a list does not; a
+list is instead treated as a collection of keys (see below).
+
+```{python}
+try:
+    with switch('x') as s:
+        s.case({'not': 'hashable'}, lambda: None)
+except TypeError as e:
+    print(e)
+```
+
+## Any hashable value works
+
+Enum members and `None` are good keys. A tuple is a single key, which makes it a natural way
+to switch on a pair of values:
+
+```{python}
+from enum import Enum
+
+
+class Light(Enum):
+    RED = 1
+    GREEN = 2
+
+
+with switch(Light.GREEN) as s:
+    s.case(Light.RED, lambda: 'stop')
+    s.case(Light.GREEN, lambda: 'go')
+    s.case(None, lambda: 'light is off')
+
+print(s.result)
+
+with switch(('admin', 'delete')) as s:
+    s.case(('admin', 'delete'), lambda: 'allowed')
+    s.case(('user', 'delete'), lambda: 'denied')
+    s.default(lambda: 'unknown action')
+
+print(s.result)
+```
+
+[Patterns](patterns.qmd) builds a small state machine on tuple keys.
+
+## Lists: several keys, one action
+
+A list key registers one case per item, all pointing at the same function:
+
+```{python}
+def kind(ch):
+    with switch(ch) as s:
+        s.case(list('aeiou'), lambda: 'vowel')
+        s.case(list('bcdfghjklmnpqrstvwxyz'), lambda: 'consonant')
+        s.default(lambda: 'not a lowercase letter')
+    return s.result
+
+
+print(kind('e'), kind('k'), kind('7'))
+```
+
+Each item is a real case, so an item that already appears in another case is a duplicate
+error, and an empty list is refused because it could never match. The list itself is never a
+key; if you want to match a sequence as one value, use a tuple.
+
+## Ranges
+
+A `range` works the same way: every number in it becomes a case. Remember that `range` is
+half-open, so `range(1, 6)` is `1` through `5`:
+
+```{python}
+with switch(5) as s:
+    s.case(range(1, 6), lambda: 'range(1, 6) covers 1 to 5')
+    s.case(range(6, 10), lambda: 'range(6, 10) covers 6 to 9')
+    s.default(lambda: 'out of range')
+
+print(s.result)
+```
+
+That `6` at the end of one case and the start of the next is correct, but you have to know
+the half-open rule to read it. For "levels one through five" it is easier to say what you
+mean.
+
+## `closed_range`: inclusive on both ends
+
+`closed_range(start, stop)` includes `stop`. With a `step`, it never goes past `stop`, and
+`stop` itself is included when the step lands on it:
+
+```{python}
+from switchlang import closed_range
+
+print(list(closed_range(1, 5)))
+print(list(closed_range(1, 6, 2)))
+print(list(closed_range(1, 7, 2)))
+```
+
+So the levels example reads the way you'd say it:
+
+```{python}
+with switch(5) as s:
+    s.case(closed_range(1, 5), lambda: 'one to five')
+    s.case(closed_range(6, 9), lambda: 'six to nine')
+    s.default(lambda: 'out of range')
+
+print(s.result)
+```
+
+One thing to watch: adjacent closed ranges share their boundary. `closed_range(1, 5)` and
+`closed_range(5, 9)` both contain `5`, which is a duplicate:
+
+```{python}
+try:
+    with switch(5) as s:
+        s.case(closed_range(1, 5), lambda: 'low')
+        s.case(closed_range(5, 9), lambda: 'high')
+except ValueError as e:
+    print(e)
+```
+
+Start the neighbor at `6`. `closed_range` also insists that `start < stop` and `step >= 1`;
+[Errors and validation](errors.qmd) lists those checks.
+
+## A note on large ranges
+
+Because every number in a range becomes its own case, `s.case(range(1, 1_000_000), f)`
+registers a million keys. That works, but it is a million set insertions on every run of the
+block. For wide numeric bands, a few comparisons before the switch, or a `default()` that does
+the arithmetic, is a better fit. switchlang is for dispatching on a readable set of values,
+not for interval arithmetic.
+
+## Next
+
+- [Fall-through](fall-through.qmd): make a matched case run the next one too.
+- [Results](results.qmd): what comes back, and when.
+
+
+### Fall-through
+
+In C, a `case` keeps running into the next one unless you write `break`, and "forgot the
+`break`" is a bug old enough to have its own folklore. switchlang turns that around: a case
+stops after itself unless you ask it to fall through. This page shows how to ask, and what
+runs when you do.
+
+## Opt in per case
+
+Pass `fallthrough=True` on a case, and when that case matches, the next registered case runs
+as well, whether or not its own key matches:
+
+```{python}
+from switchlang import switch
+
+
+def run(value):
+    log = []
+    with switch(value) as s:
+        s.case(1, lambda: log.append('one'))
+        s.case(2, lambda: log.append('two'), fallthrough=True)
+        s.case(3, lambda: log.append('three'))
+        s.case(4, lambda: log.append('four'))
+        s.default(lambda: log.append('other'))
+    return log
+
+
+print(run(1), run(2), run(3), run(9))
+```
+
+Only the `2` case asked to fall through, so only a value of `2` runs two actions. `3` runs
+alone; it doesn't fall into `4`.
+
+## Chains
+
+A case that was fallen into can itself fall through. The chain continues until it reaches a
+case without `fallthrough=True`:
+
+```{python}
+with switch('a') as s:
+    s.case('a', lambda: 'a', fallthrough=True)
+    s.case('b', lambda: 'b', fallthrough=True)
+    s.case('c', lambda: 'c')
+    s.case('d', lambda: 'd')
+    s.default(lambda: 'default')
+
+print(s.result)
+```
+
+`'a'` matched and fell through to `'b'`, which fell through to `'c'`, which stopped. The
+`'d'` case never ran, and `s.result` is the return value of the last function that did.
+
+## Falling into `default`
+
+`default()` is just another registered case, so if the case before it falls through, the
+default runs too:
+
+```{python}
+with switch('a') as s:
+    s.case('a', lambda: 'a', fallthrough=True)
+    s.default(lambda: 'default')
+
+print(s.result)
+```
+
+This is also a reason to register `default()` last: it should be the end of any chain, not
+the middle of one.
+
+## With list and range keys
+
+Fall-through on a list or range case applies when any of its items matches. A list or range
+case that is fallen *into* runs once, not once per item:
+
+```{python}
+with switch(2) as s:
+    s.case([1, 2], lambda: 'one or two', fallthrough=True)
+    s.case(range(3, 6), lambda: 'three to five')
+    s.default(lambda: 'other')
+
+print(s.result)
+```
+
+## Results under fall-through
+
+Every function in the chain runs, and `s.result` is the return value of the *last* one.
+If you need the intermediate values, collect them yourself, as `run()` above does with its
+`log` list. [Results](results.qmd) has more.
+
+## `fallthrough=None`
+
+The `fallthrough` parameter accepts `True` or `False`. The value `None` is reserved for
+switchlang's own use while it expands list and range keys; don't pass it.
+
+
+### Results
+
+Every case action is a function, so every case has a return value. switchlang hands you the
+matched one as `s.result`. This page covers when it is available, what counts as a result, and
+how it behaves with fall-through.
+
+## Read it after the block
+
+`s.result` is the return value of the function that ran. It is valid on the line after the
+`with` block, and the usual pattern is to wrap the block in a function that returns it:
+
+```{python}
+from switchlang import switch, closed_range
+
+
+def http_class(code):
+    with switch(code) as s:
+        s.case(closed_range(200, 299), lambda: 'success')
+        s.case(closed_range(300, 399), lambda: 'redirect')
+        s.case(closed_range(400, 499), lambda: 'client error')
+        s.case(closed_range(500, 599), lambda: 'server error')
+        s.default(lambda: 'unknown')
+    return s.result
+
+
+print([http_class(c) for c in (200, 302, 404, 503, 42)])
+```
+
+## Before the block ends, there is no result
+
+Nothing has run inside the block, so reading `s.result` there raises:
+
+```{python}
+try:
+    with switch('a') as s:
+        s.case('a', lambda: 'x')
+        value = s.result
+except Exception as e:
+    print(e)
+```
+
+## `None` is a result
+
+A function that returns nothing still ran, and `None` is its result. switchlang keeps "the
+result is `None`" distinct from "nothing was computed":
+
+```{python}
+with switch('a') as s:
+    s.case('a', lambda: None)
+
+print(repr(s.result))
+```
+
+So `s.case('', lambda: None)` is a perfectly good "do nothing" case, and reading `s.result`
+afterwards gives `None` rather than an error.
+
+## Fall-through: the last function wins
+
+When cases fall through, every function in the chain runs, and `s.result` is the return value
+of the last one:
+
+```{python}
+with switch(1) as s:
+    s.case(1, lambda: 'first', fallthrough=True)
+    s.case(2, lambda: 'second')
+    s.default(lambda: 'default')
+
+print(s.result)
+```
+
+To keep the earlier values, have the functions record them somewhere, as in the `log` example
+on the [Fall-through](fall-through.qmd) page.
+
+## Results that compare loosely
+
+Internally, "no result yet" is a private sentinel object, and switchlang checks for it with
+`is`, not `==`. That matters for results whose `__eq__` is generous, such as a NumPy array
+(where `==` returns an array) or an object that claims to equal everything. They are returned
+as-is, never mistaken for "nothing computed":
+
+```{python}
+class Agreeable:
+    def __eq__(self, other):
+        return True
+
+    def __repr__(self):
+        return 'Agreeable()'
+
+
+with switch('a') as s:
+    s.case('a', lambda: Agreeable())
+
+print(s.result)
+```
+
+## When the action raises
+
+If the matched function raises, the exception comes out of the end of the `with` block, and
+there is no result to read:
+
+```{python}
+def boom():
+    raise ValueError('boom')
+
+
+try:
+    with switch('a') as s:
+        s.case('a', boom)
+except ValueError as e:
+    print('raised from the end of the block:', e)
+```
+
+[Errors and validation](errors.qmd) lists everything else that can raise, and when.
+
+
+### Errors and validation
+
+A switch statement is a list of claims: these are the keys, these are the actions, this is the
+fallback. switchlang checks those claims and raises when one is wrong, instead of quietly
+skipping a case or running the wrong one. This page lists what it checks and when each check
+runs.
+
+## What is checked
+
+| Situation | Raised | When |
+|---|---|---|
+| The same key registered twice (including items of lists and ranges, and keys that compare equal such as `1` and `True`) | `ValueError` | At registration |
+| The action is `None` | `ValueError` | At registration |
+| The action is not callable (often a function that was *called* instead of passed) | `ValueError` | At registration |
+| An empty list as the key | `ValueError` | At registration |
+| An unhashable key such as a dict | `TypeError` | At registration |
+| `closed_range` with `start >= stop` or `step < 1` | `ValueError` | When `closed_range()` is called |
+| No case matched and no `default()` was registered | `Exception` | At block exit |
+| Your code raised inside the block | that exception | At block exit, before any action runs |
+| A case action raised | that exception | At block exit, from the action |
+
+"At registration" means on the `s.case(...)` line itself, inside the block. The exception
+leaves the block immediately, and no action runs.
+
+## Seeing them
+
+```{python}
+from switchlang import switch, closed_range
+
+
+def duplicate_key():
+    with switch('a') as s:
+        s.case('a', lambda: 1)
+        s.case('a', lambda: 2)
+
+
+def action_is_none():
+    with switch('a') as s:
+        s.case('a', None)
+
+
+def action_not_callable():
+    with switch('a') as s:
+        s.case('a', 'not a function')
+
+
+def empty_list():
+    with switch('a') as s:
+        s.case([], lambda: 1)
+
+
+def nothing_matched():
+    with switch('z') as s:
+        s.case('a', lambda: 1)
+
+
+def backwards_range():
+    closed_range(5, 1)
+
+
+checks = [duplicate_key, action_is_none, action_not_callable, empty_list, nothing_matched, backwards_range]
+
+for check in checks:
+    try:
+        check()
+    except Exception as e:
+        print(f'{check.__name__:20} {type(e).__name__}: {e}')
+```
+
+## Why "no match" is an error
+
+A dict lookup with `.get()` returns `None` when the key is missing. An `if / elif` chain with
+no `else` does nothing. Both are easy to write and easy to not notice. switchlang treats a
+value that matches nothing, with no default to catch it, as a mistake in the switch, and
+raises a plain `Exception` naming the value. If silence is what you want, say so:
+
+```python
+s.default(lambda: None)
+```
+
+## Exceptions inside the block
+
+If your own code raises while the block is open, the switch is abandoned and the exception
+propagates unchanged. No case action runs, not even one that had already matched. See [How a
+switch block runs](how-it-works.qmd#when-the-block-raises).
+
+If a case *action* raises, that happens at block exit, when the action runs. The exception
+propagates from the end of the `with` statement, and `s.result` is not set.
+
+## Why these are errors and not warnings
+
+Most of these mistakes have the same shape: code that looks right, imports fine, and does the
+wrong thing on one input. A duplicated key in an `if / elif` chain is dead code that nothing
+reports. A function called instead of passed produces a value where an action should be. By
+raising at the point of registration, switchlang turns each of them into a traceback on the
+first run of the block, pointing at the line to fix.
+
+
+
+## Go further
+
+### Patterns
+
+A few shapes that come up again and again once a switch block is available. Each example runs
+as shown.
+
+## Wrap the block in a function
+
+Most switch blocks exist to produce a value, and a function that returns `s.result` is the
+cleanest way to use one. It gives the switch a name, keeps `s` out of the enclosing scope, and
+makes the result available where the caller wants it:
+
+```{python}
+from switchlang import switch, closed_range
+
+
+def shipping_cost(weight_kg):
+    with switch(weight_kg) as s:
+        s.case(closed_range(0, 1), lambda: 5.00)
+        s.case(closed_range(2, 5), lambda: 9.50)
+        s.case(closed_range(6, 20), lambda: 19.00)
+        s.default(lambda: 'quote required')
+    return s.result
+
+
+print(shipping_cost(1), shipping_cost(4), shipping_cost(12), shipping_cost(80))
+```
+
+## A command loop
+
+The example that motivated the library: a loop that reads a command and dispatches on it. The
+input is scripted here so the page can run, but the shape is the same with `input()`:
+
+```{python}
+inputs = iter(['a', '3', 'v', 'q'])
+
+
+def get_action():
+    return next(inputs)
+
+
+state = {'level': None, 'running': True}
+
+
+def set_level(n):
+    state['level'] = n
+    return f'level set to {n}'
+
+
+def quit_app():
+    state['running'] = False
+    return 'bye'
+
+
+while state['running']:
+    action = get_action()
+
+    with switch(action) as s:
+        s.case(['a', 'c'], lambda: 'create account')
+        s.case(['v', 'b'], lambda: 'view bookings')
+        s.case([str(n) for n in range(1, 6)], lambda: set_level(int(action)))
+        s.case('q', quit_app)
+        s.case('', lambda: None)
+        s.default(lambda: f'unknown command {action!r}')
+
+    print(f'{action!r} -> {s.result}')
+```
+
+Two things to notice. The lambdas close over `action`, so the digit case can read the value
+that matched. And the digit keys are built with a list comprehension: a case key is an
+ordinary expression, so it can come from anywhere.
+
+## Cases built from data
+
+Because `case()` is a method call, you can register cases in a loop. That makes a switch
+block a good front end for a table of handlers that lives in configuration or is assembled at
+startup:
+
+```{python}
+parsers = {
+    'json': lambda: 'parse as JSON',
+    'yaml': lambda: 'parse as YAML',
+    'toml': lambda: 'parse as TOML',
+}
+
+extension = 'yaml'
+
+with switch(extension) as s:
+    for key, handler in parsers.items():
+        s.case(key, handler)
+    s.default(lambda: f'no parser for .{extension}')
+
+print(s.result)
+```
+
+You still get duplicate detection and the "nothing matched" check, which a bare dict lookup
+doesn't give you. If the table is the whole story and never changes, a dict is fine on its
+own; the switch earns its keep when some cases are data and others are code.
+
+## A state machine on tuple keys
+
+Tuples are hashable, so a `(state, event)` pair is a valid key. That turns a transition table
+into a switch block, with `default()` as "stay where you are":
+
+```{python}
+from enum import Enum, auto
+
+
+class Job(Enum):
+    QUEUED = auto()
+    RUNNING = auto()
+    DONE = auto()
+    FAILED = auto()
+
+
+def next_state(state, event):
+    with switch((state, event)) as s:
+        s.case((Job.QUEUED, 'start'), lambda: Job.RUNNING)
+        s.case((Job.RUNNING, 'finish'), lambda: Job.DONE)
+        s.case((Job.RUNNING, 'error'), lambda: Job.FAILED)
+        s.case((Job.FAILED, 'retry'), lambda: Job.QUEUED)
+        s.default(lambda: state)
+    return s.result
+
+
+job = Job.QUEUED
+for event in ['start', 'error', 'retry', 'start', 'finish', 'start']:
+    job = next_state(job, event)
+    print(f'{event:7} -> {job.name}')
+```
+
+The last `'start'` arrives in `DONE`, where it means nothing, and the default keeps the job
+where it is.
+
+## An explicit "do nothing" case
+
+Sometimes a value is valid and should do nothing, and you want that written down rather than
+left to the default. `lambda: None` is the idiom:
+
+```python
+s.case('', lambda: None)   # empty input: ignore it
+```
+
+It reads as a decision, which is the point. The default stays free to mean "this value was
+not expected."
+
+## Grouped actions with fall-through
+
+Fall-through is rare in practice, and when you want it, it is usually to share a tail of work
+between neighboring cases. Here the "verbose" level does everything "normal" does, plus more:
+
+```{python}
+def configure_logging(level):
+    steps = []
+    with switch(level) as s:
+        s.case('verbose', lambda: steps.append('log every request'), fallthrough=True)
+        s.case('normal', lambda: steps.append('log errors and warnings'), fallthrough=True)
+        s.case('quiet', lambda: steps.append('log errors only'))
+        s.default(lambda: steps.append('unknown level, logging errors only'))
+    return steps
+
+
+print(configure_logging('verbose'))
+print(configure_logging('quiet'))
+```
+
+The order of the cases is the order of the chain, so arrange them from "most" to "least".
+[Fall-through](fall-through.qmd) explains the rules.
+
+
+### switch, dict, if/elif or match?
+
+Python has three ordinary ways to dispatch on a value, and each one is right for something.
+This page sets them next to switchlang so you can pick on purpose.
+
+## The short version
+
+| You want to... | Reach for |
+|---|---|
+| Take data apart by shape (tuples, dataclasses, nested structures) | `match` |
+| Look up one of a fixed set of values, nothing else | a `dict` |
+| Branch on arbitrary conditions, not just equality | `if / elif / else` |
+| Dispatch on values with ranges, shared actions, a captured result, duplicate checking and optional fall-through | `switch` |
+
+## A `dict` of functions
+
+```python
+handlers = {1: method_on_one, 2: method_on_two, 3: method_three}
+result = handlers.get(value, default_method)()
+```
+
+For a handful of simple keys this is hard to beat. It gets awkward when several keys share an
+action (each one is written out), when a key is a range (unrolled by hand), and when a key is
+accidentally repeated: a dict literal silently keeps the last value, so the earlier handler
+disappears with no error. switchlang raises on the duplicate the first time the block runs,
+and lists and ranges are one line each.
+
+A dict also has no notion of "nothing matched." `.get()` with a default hides that; `[]` on
+a missing key raises `KeyError` with no sense of which switch failed. switchlang requires a
+`default()` or raises with the value in the message.
+
+## `if / elif / else`
+
+```python
+if action == 'c' or action == 'a':
+    result = create_account()
+elif action == 'l':
+    result = log_into_account()
+elif action == 'a':
+    result = update_availability()
+else:
+    unknown_command()
+```
+
+This is the most flexible option, because each branch can test anything, not just equality.
+It is also where two quiet bugs live. The `'a'` in the third branch is dead code, because the
+first branch already claims it, and nothing in Python will say so. And the `else` forgot to
+set `result`, which only matters on the branch nobody tests. switchlang turns the first into a
+`ValueError` at registration and makes the second impossible, because every case including
+the default contributes a result.
+
+Use `if / elif` when the tests aren't equality tests. Use a switch when they are.
+
+## `match`
+
+Python 3.10's structural pattern matching is excellent at what it was built for: destructuring
+data by shape.
+
+```python
+match event:
+    case {'type': 'click', 'x': x, 'y': y}:
+        handle_click(x, y)
+    case {'type': 'key', 'code': code}:
+        handle_key(code)
+```
+
+Compared with a value switch, it covers different ground:
+
+- **No fall-through.** `match` arms are exclusive. switchlang's fall-through is opt-in per
+  case.
+- **Arms are syntax, not data.** You can't build `match` cases from a list at runtime.
+  `s.case(some_list, action)` is a method call, so you can (see
+  [Patterns](patterns.qmd#cases-built-from-data)).
+- **The capture trap.** In a `case` pattern, a bare name such as `case other:` doesn't
+  compare against a variable named `other`; it binds a new one and matches everything. Keys
+  in switchlang are values, so this can't happen.
+- **No result capture.** `match` arms are blocks of statements. switchlang dispatches to
+  callables and hands back the chosen one's return value as `s.result`.
+- **Python version.** `match` needs 3.10 or newer. switchlang runs on 3.9 and newer.
+
+If you are matching on structure, use `match`. If you are dispatching on values and want
+ranges, shared actions, a result and the validation described in [Errors and
+validation](errors.qmd), use switchlang.
+
+## What switchlang is not
+
+It is not faster than any of the above; a switch block does a little more work than a dict
+lookup, because it validates as it goes. It is not a language change, and it won't be
+recognized by tools that understand `match`. It is a small, readable library for the common
+case of "here is a value, here is what to do for each of its possibilities," written so that
+the code looks like that sentence.
+

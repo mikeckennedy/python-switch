@@ -1,0 +1,104 @@
+# Fall-through
+
+In C, a [case](../reference/switch.md#switchlang.switch.case) keeps running into the next one unless you write `break`, and "forgot the `break`" is a bug old enough to have its own folklore. switchlang turns that around: a case stops after itself unless you ask it to fall through. This page shows how to ask, and what runs when you do.
+
+
+# Opt in per case
+
+Pass `fallthrough=True` on a case, and when that case matches, the next registered case runs as well, whether or not its own key matches:
+
+
+``` python
+from switchlang import switch
+
+
+def run(value):
+    log = []
+    with switch(value) as s:
+        s.case(1, lambda: log.append('one'))
+        s.case(2, lambda: log.append('two'), fallthrough=True)
+        s.case(3, lambda: log.append('three'))
+        s.case(4, lambda: log.append('four'))
+        s.default(lambda: log.append('other'))
+    return log
+
+
+print(run(1), run(2), run(3), run(9))
+```
+
+
+    ['one'] ['two', 'three'] ['three'] ['other']
+
+
+Only the `2` case asked to fall through, so only a value of `2` runs two actions. `3` runs alone; it doesn't fall into `4`.
+
+
+# Chains
+
+A case that was fallen into can itself fall through. The chain continues until it reaches a case without `fallthrough=True`:
+
+
+``` python
+with switch('a') as s:
+    s.case('a', lambda: 'a', fallthrough=True)
+    s.case('b', lambda: 'b', fallthrough=True)
+    s.case('c', lambda: 'c')
+    s.case('d', lambda: 'd')
+    s.default(lambda: 'default')
+
+print(s.result)
+```
+
+
+    c
+
+
+`'a'` matched and fell through to `'b'`, which fell through to `'c'`, which stopped. The `'d'` case never ran, and `s.result` is the return value of the last function that did.
+
+
+# Falling into [default](../reference/switch.md#switchlang.switch.default)
+
+[default()](../reference/switch.md#switchlang.switch.default) is just another registered case, so if the case before it falls through, the default runs too:
+
+
+``` python
+with switch('a') as s:
+    s.case('a', lambda: 'a', fallthrough=True)
+    s.default(lambda: 'default')
+
+print(s.result)
+```
+
+
+    default
+
+
+This is also a reason to register [default()](../reference/switch.md#switchlang.switch.default) last: it should be the end of any chain, not the middle of one.
+
+
+# With list and range keys
+
+Fall-through on a list or range case applies when any of its items matches. A list or range case that is fallen *into* runs once, not once per item:
+
+
+``` python
+with switch(2) as s:
+    s.case([1, 2], lambda: 'one or two', fallthrough=True)
+    s.case(range(3, 6), lambda: 'three to five')
+    s.default(lambda: 'other')
+
+print(s.result)
+```
+
+
+    three to five
+
+
+# Results under fall-through
+
+Every function in the chain runs, and `s.result` is the return value of the *last* one. If you need the intermediate values, collect them yourself, as `run()` above does with its `log` list. [Results](results.md) has more.
+
+
+# `fallthrough=None`
+
+The `fallthrough` parameter accepts `True` or `False`. The value `None` is reserved for switchlang's own use while it expands list and range keys; don't pass it.

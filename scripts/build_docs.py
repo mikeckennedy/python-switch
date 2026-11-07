@@ -13,7 +13,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from postprocess_site import rewrite_version_badges, version_badge
+from postprocess_site import append_llms_user_guide, rewrite_version_badges, version_badge
 
 REPO_ROOT = Path(__file__).resolve().parent.parent  # pyproject.toml + great-docs.yml live here
 SITE = REPO_ROOT / 'great-docs' / '_site'
@@ -78,6 +78,10 @@ def main() -> int:
     print(f'Rewrote {count} version badge(s) -> {badge}')
     if count == 0:
         print('WARNING: no version badges found in the built site (badge markup changed?)', file=sys.stderr)
+
+    # Great Docs writes llms.txt before the User Guide exists; list the guide pages there too.
+    if append_llms_user_guide(DEST):
+        print('llms.txt: appended User Guide and skill links')
     return 0
 
 

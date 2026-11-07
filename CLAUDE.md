@@ -25,11 +25,12 @@ from `s.result`. The whole library is ~200 lines with **zero runtime dependencie
 | [switchlang/__switchlang_impl.py](switchlang/__switchlang_impl.py) | **The entire implementation** — `switch` class and `closed_range()`. Make code changes here. |
 | [switchlang/py.typed](switchlang/py.typed) | PEP 561 marker so type checkers read our hints. |
 | [tests/test_core.py](tests/test_core.py) | The whole test suite (30 `unittest`-style tests). |
+| [user_guide/](user_guide/) | The **User Guide**: hand-written Quarto `.qmd` pages (page order set under `user_guide:` in `great-docs.yml`). Their ```` ```{python} ```` cells are **executed at build time** on every build (Quarto's freeze cache is disabled via `freeze: false` in `great-docs.yml`), so examples show real output and a behavior change breaks the build rather than going stale. |
 | [pyproject.toml](pyproject.toml) | Packaging (hatchling), metadata, version, `[dev]` extra. |
 | [ruff.toml](ruff.toml) | Lint + format config. |
 | [great-docs.yml](great-docs.yml) | Docs site config (Great Docs / Quarto). |
 | [scripts/build_docs.py](scripts/build_docs.py) | Builds docs and mirrors them into `docs/`. |
-| [scripts/postprocess_site.py](scripts/postprocess_site.py) | Post-build fix-ups on `docs/`: rewrites the navbar version badge from `pyproject.toml` + `CHANGELOG.md`. |
+| [scripts/postprocess_site.py](scripts/postprocess_site.py) | Post-build fix-ups on `docs/`: rewrites the navbar version badge from `pyproject.toml` + `CHANGELOG.md`, and appends the User Guide pages to `llms.txt` (Great Docs writes it before the guide is wired in). |
 | [scripts/serve_docs.py](scripts/serve_docs.py) | Local preview that mimics the nginx subpath. |
 | [docs/](docs/) | **Generated** static site (committed, served at `mkennedy.codes/docs/python-switch`). Do not hand-edit. |
 | [README.md](README.md) | The narrative/marketing docs and rationale. Keep in sync with behavior. |
@@ -146,9 +147,16 @@ Coding constraints — match the existing style:
   type checker is wired into the project** — ruff only does lint/format/import-sort
   (`E`/`F`/`I`). Validate hints ad hoc if you want, e.g. `uvx mypy switchlang` or
   `uvx ty check switchlang`; there is no CI gate for types.
-- When you change behavior, update **all three** places that document it:
+- When you change behavior, update **all four** places that document it:
   the **docstrings** in `__switchlang_impl.py` (source of the API reference),
-  the **README**, and the **tests**. Then rebuild the docs.
+  the **README**, the **User Guide** pages in `user_guide/`, and the **tests**. Then
+  rebuild the docs; the guide's executed code cells will fail the build if a page's
+  example no longer behaves as written.
+- **Docs voice.** The README and User Guide are deliberately written with a narrative,
+  engaging tone (a story about one small command-line app, the "spot the bug" device,
+  the C fall-through folklore). Keep that voice when editing them, but every technical
+  claim must stay exact and pinned by a test or an executed cell. Docstrings stay
+  plain reference prose.
 
 ## Versioning and release
 
@@ -209,7 +217,7 @@ sources and rebuild rather than hand-editing them.
 1. Edit [switchlang/__switchlang_impl.py](switchlang/__switchlang_impl.py).
 2. Update/extend [tests/test_core.py](tests/test_core.py) and run
    `uv run python -m unittest discover -s tests`.
-3. Keep docstrings + [README.md](README.md) in sync with the new behavior.
+3. Keep docstrings, [README.md](README.md) and the [user_guide/](user_guide/) pages in sync with the new behavior.
 4. Add a `## [Unreleased]` entry to [CHANGELOG.md](CHANGELOG.md) for any user-facing change.
 5. `uvx ruff format . && uvx ruff check .`
 6. If docs-visible, rebuild: `uv run --extra dev python scripts/build_docs.py`.

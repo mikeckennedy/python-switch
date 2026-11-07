@@ -53,6 +53,27 @@ include_in_header:
 changelog:
   enabled: false
 
+# User guide: hand-written Quarto pages in user_guide/ (Great Docs auto-discovers that
+# directory; this list fixes the section and page order). The ```{python} cells in those
+# pages are EXECUTED at build time by Quarto's jupyter kernel, so every example shows real
+# output and a behavior change in switchlang breaks the docs build instead of silently
+# going stale. Plain ```python blocks are not executed.
+user_guide:
+  - section: "Get started"
+    contents:
+      - getting-started.qmd
+      - how-it-works.qmd
+  - section: "Cases"
+    contents:
+      - keys-and-matching.qmd
+      - fall-through.qmd
+      - results.qmd
+      - errors.qmd
+  - section: "Go further"
+    contents:
+      - patterns.qmd
+      - alternatives.qmd
+
 # Custom sections. The Changelog section renders the staged CHANGELOG.md as a
 # first-class page with its own navbar link (placed after the API Reference).
 sections:
@@ -120,3 +141,9 @@ reference:
 
 # Jupyter kernel used by Quarto for any executable code cells.
 jupyter: python3
+
+# Quarto's freeze cache (Great Docs defaults to `auto`, persisted to a repo-root _freeze/)
+# would re-run a User Guide page's cells only when that .qmd file changes, so a behavior
+# change in switchlang would NOT re-execute unchanged pages and stale output would ship.
+# The whole guide executes in a few seconds; always run it fresh.
+freeze: false

@@ -1,0 +1,135 @@
+# Results
+
+Every case action is a function, so every case has a return value. switchlang hands you the matched one as `s.result`. This page covers when it is available, what counts as a result, and how it behaves with fall-through.
+
+
+# Read it after the block
+
+`s.result` is the return value of the function that ran. It is valid on the line after the `with` block, and the usual pattern is to wrap the block in a function that returns it:
+
+
+``` python
+from switchlang import switch, closed_range
+
+
+def http_class(code):
+    with switch(code) as s:
+        s.case(closed_range(200, 299), lambda: 'success')
+        s.case(closed_range(300, 399), lambda: 'redirect')
+        s.case(closed_range(400, 499), lambda: 'client error')
+        s.case(closed_range(500, 599), lambda: 'server error')
+        s.default(lambda: 'unknown')
+    return s.result
+
+
+print([http_class(c) for c in (200, 302, 404, 503, 42)])
+```
+
+
+    ['success', 'redirect', 'client error', 'server error', 'unknown']
+
+
+# Before the block ends, there is no result
+
+Nothing has run inside the block, so reading `s.result` there raises:
+
+
+``` python
+try:
+    with switch('a') as s:
+        s.case('a', lambda: 'x')
+        value = s.result
+except Exception as e:
+    print(e)
+```
+
+
+    No result has been computed (did you access switch.result inside the with block?)
+
+
+# `None` is a result
+
+A function that returns nothing still ran, and `None` is its result. switchlang keeps "the result is `None`" distinct from "nothing was computed":
+
+
+``` python
+with switch('a') as s:
+    s.case('a', lambda: None)
+
+print(repr(s.result))
+```
+
+
+    None
+
+
+So `s.case('', lambda: None)` is a perfectly good "do nothing" case, and reading `s.result` afterwards gives `None` rather than an error.
+
+
+# Fall-through: the last function wins
+
+When cases fall through, every function in the chain runs, and `s.result` is the return value of the last one:
+
+
+``` python
+with switch(1) as s:
+    s.case(1, lambda: 'first', fallthrough=True)
+    s.case(2, lambda: 'second')
+    s.default(lambda: 'default')
+
+print(s.result)
+```
+
+
+    second
+
+
+To keep the earlier values, have the functions record them somewhere, as in the `log` example on the [Fall-through](fall-through.md) page.
+
+
+# Results that compare loosely
+
+Internally, "no result yet" is a private sentinel object, and switchlang checks for it with `is`, not `==`. That matters for results whose `__eq__` is generous, such as a NumPy array (where `==` returns an array) or an object that claims to equal everything. They are returned as-is, never mistaken for "nothing computed":
+
+
+``` python
+class Agreeable:
+    def __eq__(self, other):
+        return True
+
+    def __repr__(self):
+        return 'Agreeable()'
+
+
+with switch('a') as s:
+    s.case('a', lambda: Agreeable())
+
+print(s.result)
+```
+
+
+    Agreeable()
+
+
+# When the action raises
+
+If the matched function raises, the exception comes out of the end of the `with` block, and there is no result to read:
+
+
+``` python
+def boom():
+    raise ValueError('boom')
+
+
+try:
+    with switch('a') as s:
+        s.case('a', boom)
+except ValueError as e:
+    print('raised from the end of the block:', e)
+```
+
+
+    raised from the end of the block: boom
+
+
+[Errors and validation](errors.md) lists everything else that can raise, and when.
